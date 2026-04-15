@@ -14,7 +14,6 @@ class GameLogicSpec extends AnyWordSpec with Matchers {
         val state = GameState(List(player))
 
         val newState = movePiece(state, "Stella", 1, 6)
-        // Hier darf KEIN [cite...] stehen!
         newState.players.head.pieces.head.position should be(7)
       }
     }
