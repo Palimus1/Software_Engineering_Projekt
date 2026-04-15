@@ -14,9 +14,3 @@
   println(spielfeld)
 }
 
-
-
-
-
-
-
