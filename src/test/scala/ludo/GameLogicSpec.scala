@@ -17,6 +17,29 @@ class GameLogicSpec extends AnyWordSpec with Matchers {
         newState.players.head.pieces.head.position should be(7)
       }
     }
+    "moving a piece" should {
+      "not change the other pieces" in {
+        val p1 = Piece(1, PlayerColor.Blue, 1)
+        val p2 = Piece(2, PlayerColor.Blue, 15)
+        val player = Player("Stella", PlayerColor.Blue, List(p1,p2), 0)
+        val state = GameState(List(player))
+
+        val newState = movePiece(state, "Stella", 1, 6)
+        newState.players.head.pieces(1).position should be(15)
+      }
+    }
+    "moving a piece of player1" should {
+      "not change the other players" in {
+        val p1 = Piece(1, PlayerColor.Blue, 1)
+        val player1 = Player("Stella", PlayerColor.Blue, List(p1), 0)
+        val player2 = Player("Ttella", PlayerColor.Red, List(), 10)
+        val state = GameState(List(player1, player2))
+
+        val newState = movePiece(state, "Stella", 1, 6)
+        newState.players(1) should be(player2)
+      }
+    }
+
     "moving a piece out of base" should {
       "result in no movement" in {
         val p1 = Piece(1, PlayerColor.Blue, 0)
@@ -54,6 +77,13 @@ class GameLogicSpec extends AnyWordSpec with Matchers {
         getGlobalPosition(player, p1) should be(None)
       }
     }
+    "calculating global position" should {
+      "return None if the piece is in middle" in {
+        val p1 = Piece(1, PlayerColor.Blue, 44)
+        val player = Player("Stella", PlayerColor.Blue, List(p1), 0)
+        getGlobalPosition(player, p1) should be(None)
+      }
+    }
     "player1 piece" should {
       "be on last field in String when in pos 40" in {
         val p1 = Piece(1, PlayerColor.Blue, 40)
@@ -79,7 +109,7 @@ class GameLogicSpec extends AnyWordSpec with Matchers {
     "player3 piece" should {
       "be on field 20 in String when in pos 40" in {
         val p1 = Piece(1, PlayerColor.Blue, 40)
-        val player = Player("Ttella", PlayerColor.Blue, List(p1), 20)
+        val player = Player("Utella", PlayerColor.Blue, List(p1), 20)
         val state = GameState(List(player))
         val board = Board(40)
         val result = "|__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||B1||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__|"
@@ -90,7 +120,7 @@ class GameLogicSpec extends AnyWordSpec with Matchers {
     "player4 piece" should {
       "be on field 30 in String when in pos 40" in {
         val p1 = Piece(1, PlayerColor.Blue, 40)
-        val player = Player("Ttella", PlayerColor.Blue, List(p1), 30)
+        val player = Player("Vtella", PlayerColor.Blue, List(p1), 30)
         val state = GameState(List(player))
         val board = Board(40)
         val result = "|__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||B1||__||__||__||__||__||__||__||__||__||__|"
