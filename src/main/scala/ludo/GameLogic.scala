@@ -12,19 +12,22 @@ object GameLogic {
 
   def movePiece(state: GameState, playerName: String, pieceId: Int, movedBy: Int): GameState =
     val newPlayers = state.players.map { p =>
-      if (p.name == playerName) then
-
+      if p.name == playerName then
         val newPieces = p.pieces.map { piece =>
           if (piece.id == pieceId)
-            /*return*/ piece.copy(position = piece.position + movedBy)
-          else /*return*/ piece
+            val currPos = piece.position
+            val newPos = currPos + movedBy
+            if (currPos == 0 || currPos == 44 || newPos > 44)
+              piece
+            else
+              piece.copy(position = newPos)
+          else piece
         }
-        /*return*/p.copy(pieces = newPieces)
-
+        p.copy(pieces = newPieces)
       else
-        /*return*/p
+        p
     }
-    /*return*/state.copy(players = newPlayers)
+    state.copy(players = newPlayers)
 
   def getGlobalPosition(p: Player, piece: Piece): Option[Int] = {
     if (piece.position == 0) None // Noch in der Basis
@@ -41,7 +44,7 @@ object GameLogic {
   // 0 = Base, 1-40 = Weg, 41-44 = Ziel
   case class Board(size: Int):
     def display(players: List[Player]): String =
-      val range = 1 until size
+      val range = 1 until (size + 1)
 
       val occupiedFields = for {
         p <- players
@@ -65,3 +68,4 @@ object GameLogic {
         }
       }.mkString("")
 }
+
