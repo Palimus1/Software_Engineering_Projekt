@@ -28,6 +28,14 @@ Start building the core data structures of your game.
 
 Build a simple UI using text input and output.
 
+    S: Design String Darstellung Home/Middle
+    S: Farben für String Ausgabe (4 Farben)
+    S: scalable für 1-4 players
+    
+    P: Middle (vier letzte Stufen/Positionen) aktuell immer [41 - 44]
+        -evtl Scalable? [max-3 bis max]
+    P: evtl je nach #Payers so viele Home/Häuschen [0]
+
 ## **Task 5: Build a MVC Architecture 8.5. (statt 1.5.)**
 
 - Make sure that your game has a clean MVC architecture
