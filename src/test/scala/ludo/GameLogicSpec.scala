@@ -3,6 +3,7 @@ package ludo
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import ludo.GameLogic._
+import scala.io.AnsiColor
 
 class GameLogicSpec extends AnyWordSpec with Matchers {
 
@@ -90,7 +91,7 @@ class GameLogicSpec extends AnyWordSpec with Matchers {
         val player = Player("Stella", PlayerColor.Blue, List(p1), 0)
         val state = GameState(List(player))
         val board = Board(40)
-        val result = "|__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||B1|"
+        val result = s"|__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||${PlayerColor.Blue.ansiCode}B1${AnsiColor.RESET}|"
 
         board.display(List(player)) should be(result)
       }
@@ -101,7 +102,7 @@ class GameLogicSpec extends AnyWordSpec with Matchers {
         val player = Player("Ttella", PlayerColor.Blue, List(p1), 10)
         val state = GameState(List(player))
         val board = Board(40)
-        val result = "|__||__||__||__||__||__||__||__||__||B1||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__|"
+        val result = s"|__||__||__||__||__||__||__||__||__||${PlayerColor.Blue.ansiCode}B1${AnsiColor.RESET}||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__|"
 
         board.display(List(player)) should be(result)
       }
@@ -112,7 +113,7 @@ class GameLogicSpec extends AnyWordSpec with Matchers {
         val player = Player("Utella", PlayerColor.Blue, List(p1), 20)
         val state = GameState(List(player))
         val board = Board(40)
-        val result = "|__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||B1||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__|"
+        val result = s"|__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||${PlayerColor.Blue.ansiCode}B1${AnsiColor.RESET}||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__|"
 
         board.display(List(player)) should be(result)
       }
@@ -123,7 +124,7 @@ class GameLogicSpec extends AnyWordSpec with Matchers {
         val player = Player("Vtella", PlayerColor.Blue, List(p1), 30)
         val state = GameState(List(player))
         val board = Board(40)
-        val result = "|__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||B1||__||__||__||__||__||__||__||__||__||__|"
+        val result = s"|__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||__||${PlayerColor.Blue.ansiCode}B1${AnsiColor.RESET}||__||__||__||__||__||__||__||__||__||__|"
 
         board.display(List(player)) should be(result)
       }

@@ -31,6 +31,8 @@ Build a simple UI using text input and output.
     S: Design String Darstellung Home/Middle
     S: Farben für String Ausgabe (4 Farben)
     S: scalable für 1-4 players
+
+        + Tests immer!
     
     P: Middle (vier letzte Stufen/Positionen) aktuell immer [41 - 44]
         -evtl Scalable? [max-3 bis max]

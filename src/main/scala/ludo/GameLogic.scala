@@ -1,8 +1,13 @@
 package ludo
 
+import scala.io.AnsiColor
+
 object GameLogic {
-  enum PlayerColor:
-    case Red, Blue, Green, Yellow
+  enum PlayerColor(val ansiCode: String):
+    case Red extends PlayerColor(AnsiColor.RED)
+    case Blue extends PlayerColor(AnsiColor.BLUE)
+    case Green extends PlayerColor(AnsiColor.GREEN)
+    case Yellow extends PlayerColor(AnsiColor.YELLOW)
 
   case class Piece(id: Int, color: PlayerColor, position: Int)
 
@@ -61,11 +66,10 @@ object GameLogic {
       range.map { pos =>
         posMap.get(pos) match {
           case Some((player, piece)) =>
-            // Zeigt anfangsbuchstabe der Farbe und piece-id
-            s"|${player.color.toString.head}${piece.id}|"
+            // Zeigt anfangsbuchstabe der Farbe und piece-id (plus hat die Farbe)
+            s"|${player.color.ansiCode}${player.color.toString.head}${piece.id}${AnsiColor.RESET}|"
 
           case None => "|__|"
         }
       }.mkString("")
 }
-
