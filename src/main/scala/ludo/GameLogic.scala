@@ -17,13 +17,17 @@ case class GameState(players: List[Player])
 object GameState {
   def create(playerNames: List[String], config: BoardConfig): GameState = {
 
-    val color = List(PlayerColor.Blue,PlayerColor.Red,PlayerColor.Green,PlayerColor.Yellow)
-    //  zip erstellt aus zwei listen eine tupel liste
-    //  zipWithIndex fügt ein index hinzu, wieder ein tupel.      hier: tupel in tupel
-    val players = playerNames.zip(color).zipWithIndex.map { case ((name, color), index) =>
-      //  offset berechnen
-      val offset = index * (config.fieldSize / playerNames.size)
-      //4 pieces erstellen
+    //mit namen auffüllen, falls zu wenig angegeben
+    val defaults = List("PC 1", "PC 2", "PC 3", "PC 4")
+    // Nur so viele Namen nehmen, wie in config erlaubt
+    val limitedNames = (playerNames ++ defaults).take(config.numPlayers)
+
+    val colors = List(PlayerColor.Blue, PlayerColor.Red, PlayerColor.Green, PlayerColor.Yellow)
+
+    // zip kombiniert nur so viele Elemente, wie in der kürzeren Liste sind
+    val players = limitedNames.zip(colors).zipWithIndex.map { case ((name, color), index) =>
+      // Offset-Berechnung bleibt dynamisch
+      val offset = index * (config.fieldSize / config.numPlayers)
       val pieces = (1 to 4).map(id => Piece(id, color, 0)).toList
 
       Player(name, color, pieces, offset)
@@ -37,7 +41,55 @@ case class BoardConfig(fieldSize: Int, numPlayers: Int)
 case class BoardRenderer(config: BoardConfig):
   // Konzept für Brett: Hochzählen
   // 0 = Base, 1-40 = Weg, 41-44 = Ziel
-  def display(state: GameState, rules: GameLogic): String =
+
+  private def printHome(state: GameState, rules: GameLogic): String = {
+   // [_][_][_][_]
+
+    val playerBases = state.players.map { player =>
+
+      val slots = (1 to 4).map { slotId =>
+        val maybePiece = player.pieces.find(p => p.id == slotId)
+        maybePiece match {
+          case Some(p) if p.position == 0 =>
+            s"[${player.color.ansiCode}${player.color.toString.head}${p.id}${AnsiColor.RESET}]"
+          case _ => "[__]"
+        }
+      }
+
+      slots.mkString("")
+    }
+
+    playerBases.mkString("   ")
+  }
+
+  private def printTarget(state: GameState, rules: GameLogic): String = {
+
+    val playerTargets = state.players.map { player =>
+
+
+      val targetSlots = (1 to 4).map { slotId =>
+
+        val targetPos = config.fieldSize + slotId
+        val maybePiece = player.pieces.find(p => p.position == targetPos)
+
+        maybePiece match {
+          case Some(p) =>
+
+            s"{${player.color.ansiCode}${player.color.toString.head}${p.id}${AnsiColor.RESET}}"
+          case None =>
+
+            "{  }"
+        }
+      }
+
+      targetSlots.mkString("")
+    }
+
+    // Die Zielbereiche aller Spieler nebeneinander mit Abstand ausgeben
+    playerTargets.mkString("   ")
+  }
+
+  private def printField(state: GameState, rules: GameLogic): String =
     val range = 1 until (rules.config.fieldSize + 1)
 
     val occupiedFields = for {
@@ -61,6 +113,11 @@ case class BoardRenderer(config: BoardConfig):
         case None => "|__|"
       }
     }.mkString("")
+
+  def renderAll(state: GameState, rules: GameLogic): String = {
+    val board = List(printHome(state, rules),printField(state, rules), printTarget(state, rules))
+    board.mkString("\n")
+  }
 
 case class GameLogic(config: BoardConfig) {
 

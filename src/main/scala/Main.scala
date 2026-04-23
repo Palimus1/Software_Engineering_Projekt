@@ -1,44 +1,81 @@
-
 import ludo._
+import scala.annotation.tailrec
+import scala.io.StdIn
 
 @main def main(): Unit = {
-  /*
-    Authors: Stella Keller, Paul Boos
-  */
 
-  val bluePieces = List(Piece(1, PlayerColor.Blue, 1),
-    Piece(2, PlayerColor.Blue, 0),
-    Piece(3, PlayerColor.Blue, 0),
-    Piece(4, PlayerColor.Blue, 0))
-  val redPieces = List(Piece(1, PlayerColor.Red, 0),
-    Piece(2, PlayerColor.Red, 0),
-    Piece(3, PlayerColor.Red, 9),
-    Piece(4, PlayerColor.Red, 0))
-  val yellowPieces = List(Piece(1, PlayerColor.Yellow, 0),
-    Piece(2, PlayerColor.Yellow, 0),
-    Piece(3, PlayerColor.Yellow, 0),
-    Piece(4, PlayerColor.Yellow, 0))
-  val greenPieces = List(Piece(1, PlayerColor.Green, 0),
-    Piece(2, PlayerColor.Green, 0),
-    Piece(3, PlayerColor.Green, 30),
-    Piece(4, PlayerColor.Green, 0))
+  println("Willkommen zu Mensch ärger dich nicht\n")
 
+  println("Bitte die Anzahl Spieler angeben (1-4): ")
+  val numPInput = StdIn.readLine()
+  val numPlayers = numPInput.toIntOption.getOrElse(0)
 
-  val player1 = Player("Stella", PlayerColor.Blue, bluePieces, 0)
-  val player2 = Player("Ttella", PlayerColor.Red, redPieces, 10)
-  val player3 = Player("Utella", PlayerColor.Yellow, yellowPieces, 20)
-  val player4 = Player("Vtella", PlayerColor.Green, greenPieces, 30)
+  println(s"Bitte gib die Namen für $numPlayers Spieler ein:")
+  val playerNames = collectNames(numPlayers, Nil)
 
+  println("Bitte die Feldgröße (min. 1): ")
+  val fieldInput = StdIn.readLine()
+  val fieldSize = fieldInput.toIntOption.getOrElse(0)
 
-  val state = GameState(List(player1, player2, player3, player4))
-  val config = BoardConfig(40, 4)
+  val config = BoardConfig(fieldSize, numPlayers)
   val renderer = BoardRenderer(config)
   val rules = GameLogic(config)
+  val initialState = GameState.create(playerNames, config)
 
-  // p1 auf Feld 2, p2 auf Feld 5
-
-  println(renderer.display(state, rules))
-
-
+  // Start der rekursiven Schleife
+  gameLoop(initialState, 0, rules, renderer)
 }
 
+@tailrec
+def collectNames(remaining: Int, acc: List[String]): List[String] = {
+  if (remaining <= 0) {
+    // Abbruchbedingung: Keine Namen mehr übrig Liste umdrehen (da Nil-Anfügen verkehrt herum baut)
+    acc.reverse
+  } else {
+    // Eingabe lesen
+    print(s"Name für Spieler ${acc.size + 1}: ")
+    val name = StdIn.readLine()
+
+    // Rekursion: Ein Name weniger zu sammeln, Name zur Liste hinzufügen
+    collectNames(remaining - 1, name :: acc)
+  }
+}
+
+@tailrec
+def gameLoop(state: GameState, currentPlayerIndex: Int, rules: GameLogic, renderer: BoardRenderer): Unit = {
+  // 1. Aktuellen Spieler bestimmen
+  val currentPlayer = state.players(currentPlayerIndex)
+
+  // 2. Board anzeigen
+  println("\n" * 2) // Etwas Platz schaffen
+  println(renderer.renderAll(state, rules))
+  println(s"Dran ist: ${currentPlayer.name} (${currentPlayer.color})")
+
+/*
+  // 3. Würfeln (Simuliert)
+  val roll = scala.util.Random.nextInt(6) + 1
+  println(s"Du hast eine $roll gewürfelt!")
+
+  // 4. Eingabe abfragen (Welches Piece 1-4?)
+  print("Wähle eine Figur (1-4): ")
+  val input = StdIn.readLine()
+
+  // Eingabe sicher in eine Zahl umwandeln
+  val pieceId = input.toIntOption.getOrElse(1)
+*/
+  print("Wähle eine Figur (1-4): ")
+  val pieceInput = StdIn.readLine()
+  print("Wie weit soll sie sich bewegen: ")
+  val moveInput = StdIn.readLine()
+
+  val pieceId = pieceInput.toIntOption.getOrElse(1)
+  val moveBy = moveInput.toIntOption.getOrElse(0)
+  // 5. Neuen Zustand berechnen
+  val nextState = rules.movePiece(state, currentPlayer.name, pieceId, moveBy)
+
+  // 6. Nächsten Spieler bestimmen (Reihum)
+  val nextPlayerIndex = (currentPlayerIndex + 1) % state.players.size
+
+  // 7. Rekursiver Aufruf -> Die "Schleife" geht von vorne los mit neuen Werten
+  gameLoop(nextState, nextPlayerIndex, rules, renderer)
+}
