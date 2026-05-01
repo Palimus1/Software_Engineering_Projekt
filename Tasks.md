@@ -113,6 +113,25 @@ dann: `sbt clean coverage test coverageReport`
 
 bei success dann: `sbt sonarScan`
 
+**Probleme:**
+Wie vermeidet man das Unit, bzw ist das hier akzeptabel
+```scala
+ def update(): Unit =
+   print(processInput())
+```
+Wie kann man die vars los werden in Observable und Controller
+```scala
+  class Observable:
+    private var subscribers: Vector[Observer] = Vector()
+ ```
+ ```scala
+ def doMove(playerName: String, pieceId: Int, movedBy: Int): Unit = {
+  gameState = movePieceLogic(gameState, pieceId, movedBy)
+  // Hier kommt später der Aufruf für notifyObservers() hin!
+  notifyObservers()
+}
+ ```
+
 ## **Task 6: Set up a Continuous Development Process 22.5. (statt 15.5)**
 
 - Make your development independant of the local platform using a build mechanism like sbt

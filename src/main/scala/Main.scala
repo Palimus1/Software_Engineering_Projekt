@@ -1,81 +1,65 @@
-import ludo._
+import ludo.model.*
+import ludo.controller.Controller
+import ludo.view.Tui
 import scala.annotation.tailrec
 import scala.io.StdIn
 
 @main def main(): Unit = {
-
   println("Willkommen zu Mensch ärger dich nicht\n")
 
+  // 1. Setup / Konfiguration abfragen
   println("Bitte die Anzahl Spieler angeben (1-4): ")
-  val numPInput = StdIn.readLine()
-  val numPlayers = numPInput.toIntOption.getOrElse(0)
+  val numPlayers = StdIn.readLine().toIntOption.getOrElse(4)
 
   println(s"Bitte gib die Namen für $numPlayers Spieler ein:")
   val playerNames = collectNames(numPlayers, Nil)
 
-  println("Bitte die Feldgröße (min. 1): ")
-  val fieldInput = StdIn.readLine()
-  val fieldSize = fieldInput.toIntOption.getOrElse(0)
+  println("Bitte die Feldgröße (Standard 40): ")
+  val fieldSize = StdIn.readLine().toIntOption.getOrElse(40)
 
+  // 2. MVC Komponenten initialisieren
   val config = BoardConfig(fieldSize, numPlayers)
-  val renderer = BoardRenderer(config)
-  val rules = GameLogic(config)
   val initialState = GameState.create(playerNames, config)
 
-  // Start der rekursiven Schleife
-  gameLoop(initialState, 0, rules, renderer)
+  // Der Controller verwaltet den State
+  val controller = Controller(initialState, config)
+
+  // Die TUI meldet sich beim Erstellen automatisch als Observer an
+  val tui = Tui(controller)
+
+  // Einmaliges manuelles Anzeigen zum Start
+  println("\nSpiel startet!")
+  tui.update()
+
+  // 3. Start der Spielschleife
+  gameLoop(controller)
 }
 
 @tailrec
 def collectNames(remaining: Int, acc: List[String]): List[String] = {
-  if (remaining <= 0) {
-    // Abbruchbedingung: Keine Namen mehr übrig Liste umdrehen (da Nil-Anfügen verkehrt herum baut)
-    acc.reverse
-  } else {
-    // Eingabe lesen
+  if (remaining <= 0) acc.reverse
+  else {
     print(s"Name für Spieler ${acc.size + 1}: ")
-    val name = StdIn.readLine()
-
-    // Rekursion: Ein Name weniger zu sammeln, Name zur Liste hinzufügen
-    collectNames(remaining - 1, name :: acc)
+    collectNames(remaining - 1, StdIn.readLine() :: acc)
   }
 }
 
 @tailrec
-def gameLoop(state: GameState, currentPlayerIndex: Int, rules: GameLogic, renderer: BoardRenderer): Unit = {
-  // 1. Aktuellen Spieler bestimmen
-  val currentPlayer = state.players(currentPlayerIndex)
+def gameLoop(controller: Controller): Unit = {
+  // Aktuellen Spieler aus dem Controller-State lesen
+  val currPlayer = controller.gameState.currentPlayer
 
-  // 2. Board anzeigen
-  println("\n" * 2) // Etwas Platz schaffen
-  println(renderer.renderAll(state, rules))
-  println(s"Dran ist: ${currentPlayer.name} (${currentPlayer.color})")
+  println(s"\nAktueller Spieler: ${currPlayer.name} (${currPlayer.color})")
 
-/*
-  // 3. Würfeln (Simuliert)
-  val roll = scala.util.Random.nextInt(6) + 1
-  println(s"Du hast eine $roll gewürfelt!")
-
-  // 4. Eingabe abfragen (Welches Piece 1-4?)
   print("Wähle eine Figur (1-4): ")
-  val input = StdIn.readLine()
+  val pieceId = StdIn.readLine().toIntOption.getOrElse(1)
 
-  // Eingabe sicher in eine Zahl umwandeln
-  val pieceId = input.toIntOption.getOrElse(1)
-*/
-  print("Wähle eine Figur (1-4): ")
-  val pieceInput = StdIn.readLine()
   print("Wie weit soll sie sich bewegen: ")
-  val moveInput = StdIn.readLine()
+  val moveBy = StdIn.readLine().toIntOption.getOrElse(0)
 
-  val pieceId = pieceInput.toIntOption.getOrElse(1)
-  val moveBy = moveInput.toIntOption.getOrElse(0)
-  // 5. Neuen Zustand berechnen
-  val nextState = rules.movePiece(state, currentPlayer.name, pieceId, moveBy)
+  // Der Controller führt den Zug aus und BENACHRICHTIGT die TUI automatisch[cite: 7, 10]
+  controller.doMove(pieceId, moveBy)
 
-  // 6. Nächsten Spieler bestimmen (Reihum)
-  val nextPlayerIndex = (currentPlayerIndex + 1) % state.players.size
-
-  // 7. Rekursiver Aufruf -> Die "Schleife" geht von vorne los mit neuen Werten
-  gameLoop(nextState, nextPlayerIndex, rules, renderer)
+  // Rekursion für die nächste Runde
+  gameLoop(controller)
 }
