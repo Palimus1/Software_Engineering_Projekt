@@ -46,6 +46,73 @@ Build a simple UI using text input and output.
     - Cycles
     - Layer conflicts
 
+
+    https://www.sonarsource.com/products/sonarqube/downloads/#modal=sonarqube-community-build-modal-form
+
+```scala
+PS C:\Users\stell\Documents\GitHub\Software_Engineering_Projekt> cd C:\CodeTools\sonarqube-26.4.0.121862\sonarqube-26.4.0.121862\bin\windows-x86-64
+>> 
+PS C:\CodeTools\sonarqube-26.4.0.121862\sonarqube-26.4.0.121862\bin\windows-x86-64> .\StartSonar.bat
+>> 
+```
+
+**http://localhost:9000**
+- Benutzername: `admin`
+- Passwort: `admin`
+
+dann
+
+→ **Create a local project ganz unten**
+
+name: `Software_Engineering_Projekt` 
+
+branch: master
+
+dann **Follows the instance's default** wählen
+
+---
+
+plugins.sbt:
+
+```scala
+
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.0.12")
+addDependencyTreePlugin // Eingebautes Dependency-Graph-Plugin (seit sbt 1.4+)
+addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.3.11")
+addSbtPlugin("com.sonar-scala" % "sbt-sonar" % "2.3.0")
+```
+
+build.sbt
+
+```scala
+val scala3Version = "3.8.2"
+
+lazy val root = project
+  .in(file("."))
+  .settings(
+    name := "Projekt",
+    version := "0.1.0-SNAPSHOT",
+
+    scalaVersion := scala3Version,
+
+    libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.20",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.20" % "test",
+    Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
+
+    sonarProperties := Map(
+      "sonar.projectKey" -> "Software_Engineering_Projekt",
+      "sonar.host.url" -> "http://localhost:9000",
+      "sonar.token" -> "sqp_5e7fe4b548a99d932b47e78dc9f0d1c5d8732107",
+      "sonar.scala.scoverage.reportPath" -> "target/scala-3.8.2/scoverage-report/scoverage.xml"
+    )
+  )
+
+```
+
+dann: `sbt clean coverage test coverageReport`
+
+bei success dann: `sbt sonarScan`
+
 ## **Task 6: Set up a Continuous Development Process 22.5. (statt 15.5)**
 
 - Make your development independant of the local platform using a build mechanism like sbt
