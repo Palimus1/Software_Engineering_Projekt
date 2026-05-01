@@ -1,6 +1,0 @@
-projectKey=Software_Engineering_Projekt
-serverUrl=http://localhost:9000
-serverVersion=26.4.0.121862
-dashboardUrl=http://localhost:9000/dashboard?id=Software_Engineering_Projekt
-ceTaskId=a16e63f5-2724-4732-8bce-1f6032b134f3
-ceTaskUrl=http://localhost:9000/api/ce/task?id=a16e63f5-2724-4732-8bce-1f6032b134f3
