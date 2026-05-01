@@ -33,4 +33,4 @@ metals.sbt
 
 build.sbt
 project/plugins.sbt
-report-task.txt
+.scannerwork/report-task.txt
