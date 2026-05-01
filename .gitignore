@@ -30,3 +30,7 @@ metals.sbt
 .idea
 .idea_modules
 /.worksheet/
+
+build.sbt
+project/plugins.sbt
+report-task.txt
