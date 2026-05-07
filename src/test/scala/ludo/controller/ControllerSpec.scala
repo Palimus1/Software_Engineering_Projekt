@@ -14,11 +14,20 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         val controller = Controller(initialState, config)
         val firstPlayer = controller.gameState.currentPlayerIndex // 0
 
-        // Alice (Blau) würfelt eine 6 und zieht Figur 1 aus der Base
         controller.doMove(1, 6)
 
-        controller.gameState.players(0).pieces(0).position should be(1)
+        controller.gameState.players.head.pieces.head.position should be(1)
         controller.gameState.currentPlayerIndex should be(1) // Jetzt ist Bob dran
+      }
+
+      "update the game state" in {
+        val controller = Controller(initialState, config)
+
+        controller.doMove(1, 6) //player 1
+        controller.doMove(1, 6) //player 2
+        controller.doMove(1, 6) //player 3
+        controller.gameState.players.head.pieces.head.position should be(7)
+
       }
 
       "not move a piece out of base if not a 6 is rolled" in {
@@ -28,7 +37,24 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         controller.gameState.players(0).pieces(0).position should be(0)
         controller.gameState.currentPlayerIndex should be(1) // Spieler wechselt trotzdem
       }
+
+
+
+
+      "not move the piece if it would move the piece outside the board" in {
+        val pieces1 = List(Piece(1, PlayerColor.Blue, 40))
+        val pieces2 = List(Piece(1, PlayerColor.Red, 0))
+        val players = List(Player("Stella", PlayerColor.Blue, pieces1, 0), Player("Ttella", PlayerColor.Red, pieces2, 0))
+        val state = GameState(players)
+        val controller = Controller(state, config)
+
+        controller.doMove(1, 5)
+        controller.gameState.players.head.pieces.head.position should be (40)
+
+      }
     }
+
+
 
     "calculating global positions" should {
       val controller = Controller(initialState, config)

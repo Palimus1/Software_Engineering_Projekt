@@ -19,6 +19,20 @@ class TuiSpec extends AnyWordSpec with Matchers {
       output should include(s"[${AnsiColor.BLUE}B1${AnsiColor.RESET}]")
     }
 
+    "render the target area correctly" in {
+      val config = BoardConfig(40, 1)
+      val pieces = List(Piece(1, PlayerColor.Blue, 44))
+      val players = List(Player("Stella", PlayerColor.Blue, pieces, 0))
+      val thisState = GameState(players)
+      val thisController = Controller(thisState, config)
+      val thisTui = Tui(thisController)
+      val output = thisTui.processInput()
+      //thisTui.update()
+      // Alice ist Blau (B), Figur 1 sollte in Base sein: [B1]
+      output should include(s"{${AnsiColor.BLUE}B1${AnsiColor.RESET}}")
+    }
+
+
     "render a piece on the field correctly" in {
       // Manuelle Manipulation für den Test: Alice Figur 1 auf Feld 5
       controller.gameState = controller.gameState.copy(
