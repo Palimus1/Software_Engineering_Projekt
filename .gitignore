@@ -31,6 +31,6 @@ metals.sbt
 .idea_modules
 /.worksheet/
 
-build.sbt
-project/plugins.sbt
+
+
 .scannerwork/report-task.txt
