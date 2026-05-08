@@ -1,4 +1,4 @@
-package ludo.view
+package ludo.aview
 
 import ludo.model.*
 import ludo.controller.Controller

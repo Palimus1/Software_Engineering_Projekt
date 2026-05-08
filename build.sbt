@@ -2,6 +2,7 @@ val scala3Version = "3.8.2"
 
 lazy val root = project
   .in(file("."))
+  .enablePlugins(SonarPlugin) // <--- CRITICAL: Das aktiviert die Sonar-Anbindung
   .settings(
     name := "Projekt",
     version := "0.1.0-SNAPSHOT",
@@ -12,10 +13,15 @@ lazy val root = project
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.20" % "test",
     Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
 
-    sonarProperties := Map(
+    // In deiner build.sbt innerhalb der .settings(...)
+    sonarProperties ++= Map(
       "sonar.projectKey" -> "Software_Engineering_Projekt",
       "sonar.host.url" -> "http://localhost:9000",
-      "sonar.token" -> "sqp_5e7fe4b548a99d932b47e78dc9f0d1c5d8732107",
-      "sonar.scala.scoverage.reportPath" -> "target/scala-3.8.2/scoverage-report/scoverage.xml"
+      "sonar.token" -> "squ_cbb0a4be896f58d30f0a75e7af65d62343728d45",
+      // Hier sagst du SonarQube explizit, wo der SCALA-Report liegt
+      "sonar.scala.scoverage.reportPath" -> "target/scala-3.8.2/scoverage-report/scoverage.xml",
+      // Diese Zeile hilft SonarQube, die Dateien den Berichten zuzuordnen
+      "sonar.sources" -> "src/main/scala",
+      "sonar.tests" -> "src/test/scala"
     )
   )

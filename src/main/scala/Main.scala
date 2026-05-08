@@ -1,6 +1,6 @@
 import ludo.model.*
 import ludo.controller.Controller
-import ludo.view.Tui
+import ludo.aview.Tui
 import scala.annotation.tailrec
 import scala.io.StdIn
 
