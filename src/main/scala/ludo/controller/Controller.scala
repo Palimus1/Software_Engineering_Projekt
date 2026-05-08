@@ -1,7 +1,7 @@
 package ludo.controller
 
 import ludo.model.*
-import ludo.observer.Observable
+import ludo.util.Observable
 
 class Controller(var gameState: GameState, val config: BoardConfig) extends Observable:
 

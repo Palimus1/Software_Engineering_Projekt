@@ -2,7 +2,7 @@
 
 ##### Test befehle
 
->sbt clean coverage test coverageReport
+> sbt clean coverage test coverageReport
 
 Dann in 
 > projekt\target\scala-3.8.2\scoverage-report/index.html
@@ -14,7 +14,7 @@ Dann in
 
 Erst programm im terminal starten:
 ```shell
-PS C:\Users\stell\Documents\GitHub\Software_Engineering_Projekt> cd C:\CodeTools\sonarqube-26.4.0.121862\sonarqube-26.4.0.121862\bin\windows-x86-64
+PS C:> cd C:\CodeTools\sonarqube-26.4.0.121862\sonarqube-26.4.0.121862\bin\windows-x86-64
 >> 
 PS C:\CodeTools\sonarqube-26.4.0.121862\sonarqube-26.4.0.121862\bin\windows-x86-64> .\StartSonar.bat
 >> 

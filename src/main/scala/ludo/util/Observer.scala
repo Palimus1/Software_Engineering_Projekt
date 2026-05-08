@@ -1,4 +1,4 @@
-package ludo.observer
+package ludo.util
 
 trait Observer:
   def update(): Unit

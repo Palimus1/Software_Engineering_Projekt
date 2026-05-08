@@ -2,7 +2,7 @@ package ludo.view
 
 import ludo.model.*
 import ludo.controller.Controller
-import ludo.observer.Observer
+import ludo.util.Observer
 
 import scala.io.AnsiColor
 
@@ -13,14 +13,11 @@ case class Tui(controller: Controller) extends Observer:
   // Konzept für Brett: Hochzählen
   // 0 = Base, 1-40 = Weg, 41-44 = Ziel
 
-  // 1. Der Seiteneffekt: Diese Methode wird vom Observer aufgerufen.
-  // Sie ist schwer zu testen, enthält aber auch keine Logik mehr.
+ 
   def update(): Unit =
     print(processInput())
 
-  // 2. Die Logik: Diese Methode gibt nur einen String zurück.
-  // Du kannst sie in deinen Tests einfach aufrufen und prüfen:
-  // tui.processInput() should include ("|B1|")
+ 
   def processInput(): String =
     renderAll()
 
