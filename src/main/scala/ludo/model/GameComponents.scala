@@ -7,12 +7,12 @@ case class Player(name: String, color: PlayerColor, pieces: List[Piece], startOf
 
 case class BoardConfig(fieldSize: Int, numPlayers: Int)
 
-case class GameState(players: List[Player], currentPlayerIndex: Int = 0):
+case class GameState(players: List[Player], currentPlayerIndex: Int = 0, errors: String = ""):
   def currentPlayer: Player = players(currentPlayerIndex)
 //Companion Object mit statischer methode um GameState richtig zu initialisieren
 object GameState {
   def create(playerNames: List[String], config: BoardConfig): GameState = {
-
+    
     //mit namen auffüllen, falls zu wenig angegeben
     val defaults = List("PC 1", "PC 2", "PC 3", "PC 4")
     // Nur so viele Namen nehmen, wie in config erlaubt

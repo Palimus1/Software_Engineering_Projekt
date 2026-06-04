@@ -16,23 +16,51 @@ class Controller(var gameState: GameState, val config: BoardConfig) extends Obse
 
   // Die reine Logik-Funktion (ehemals in GameLogic)
   private def movePieceLogic(state: GameState, pieceId: Int, movedBy: Int): GameState = {
-    val player = state.currentPlayer
+    val currentplayer = state.currentPlayer
 
-    val updatedPieces = player.pieces.map { p =>
-      if (p.id == pieceId) {
-        p.copy(position = calculatePos(p.position, movedBy))
-      }
-      else p
+    currentplayer.pieces.find(_.id == pieceId) match { //piece mit der pieceID holen
+      case None =>  //falls piece nicht vorhande also nicht 1-4
+        state
+
+      case Some(pieceToMove) =>
+        val relPos = calculatePos(pieceToMove.position, movedBy)  //neue rel. Position des bewegten Piece berechnen
+        val movedPiece = pieceToMove.copy(position = relPos)      //neues Piece mit aktualisierter Position erstellen
+
+        val targetGlobalPosOpt = getGlobalPosition(currentplayer, movedPiece)  // Globale Position des bewegten Piece, kann None sein wenn in Base
+
+        //schauen, ob ein eigenes Piece die bewegung blockiert
+        val isBlocked = currentplayer.pieces.exists( p => p.id != pieceId && p.position > 0 && p.position == relPos); //exists prüft bedingung für jedes element und ist wahr falls es für 1 element wahr ist
+
+        if (isBlocked) {  //falls blockiert wird einfach nichts am gamestate geändert und spieler ist nochmal dran
+          state
+        } else {
+          val updatedPlayers = state.players.map { player =>
+            //bewegtes pieces wird jetzt im aktuellen spieler aktualisiert
+            if (player == currentplayer) {
+              val updatedPieces = player.pieces.map { piece =>
+                if (piece.id == pieceId) movedPiece else piece
+              }
+              player.copy(pieces = updatedPieces)
+
+            } else {//andere spieler
+              val updatedPieces = player.pieces.map { enemyPiece =>
+                val enemyGlobalPosOpt = getGlobalPosition(player, enemyPiece)
+
+                if (targetGlobalPosOpt.isDefined && targetGlobalPosOpt == enemyGlobalPosOpt) {
+                  enemyPiece.copy(position = 0) //Schlagen
+                } else {
+                  enemyPiece
+                }
+              }
+
+              player.copy(pieces = updatedPieces)
+            }
+          }
+
+          val nextPlayerIndex = (state.currentPlayerIndex + 1) % state.players.size
+          state.copy(players = updatedPlayers, currentPlayerIndex = nextPlayerIndex)
+        }
     }
-
-    val updatedPlayer = player.copy(pieces = updatedPieces)
-    //.updated ist ein .copy um nur ein element einer liste zu ändern
-    val updatedPlayers = state.players.updated(state.currentPlayerIndex, updatedPlayer)
-
-    val nextPlayerIndex = (state.currentPlayerIndex + 1) % state.players.size
-
-
-    state.copy(players = updatedPlayers, currentPlayerIndex = nextPlayerIndex)
   }
 
   private def calculatePos(curr: Int, moved: Int): Int = {
