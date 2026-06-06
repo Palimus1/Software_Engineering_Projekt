@@ -46,20 +46,31 @@ def collectNames(remaining: Int, acc: List[String]): List[String] = {
 
 @tailrec
 def gameLoop(controller: Controller): Unit = {
-  // Aktuellen Spieler aus dem Controller-State lesen
-  val currPlayer = controller.gameState.currentPlayer
+  //checken ob jemand gewonnen hat
+  if (controller.gameState.winner != "") {
+    return
+  }
+
+  val state = controller.gameState
+  val currPlayer = state.currentPlayer
 
   println(s"\nAktueller Spieler: ${currPlayer.name} (${currPlayer.color})")
 
-  print("Wähle eine Figur (1-4): ")
-  val pieceId = StdIn.readLine().toIntOption.getOrElse(1)
+  state.diceRoll match {
+    case None =>
+      // PHASE 1: Es wurde noch nicht gewürfelt
+      println("Drücke ENTER zum Würfeln...")
+      StdIn.readLine() // Wartet einfach auf die Enter-Taste
+      controller.rollDice()
+      gameLoop(controller) // Wieder von vorne starten, um das Ergebnis zu sehen
 
-  print("Wie weit soll sie sich bewegen: ")
-  val moveBy = StdIn.readLine().toIntOption.getOrElse(0)
+    case Some(roll) =>
+      // PHASE 2: Es wurde gewürfelt, jetzt Figur auswählen
+      println(s"🎲 Du hast eine $roll gewürfelt!")
+      print("Wähle eine Figur (1-4): ")
+      val pieceId = StdIn.readLine().toIntOption.getOrElse(0)
 
-  // Der Controller führt den Zug aus und BENACHRICHTIGT die TUI automatisch[cite: 7, 10]
-  controller.doMove(pieceId, moveBy)
-
-  // Rekursion für die nächste Runde
-  gameLoop(controller)
+      controller.doMove(pieceId) // Controller macht den Zug und löscht danach den diceRoll
+      gameLoop(controller)
+  }
 }

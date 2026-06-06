@@ -13,7 +13,6 @@ case class Tui(controller: Controller) extends Observer:
   // Konzept für Brett: Hochzählen
   // 0 = Base, 1-40 = Weg, 41-44 = Ziel
 
- 
   def update(): Unit =
     print(processInput())
 
@@ -23,7 +22,8 @@ case class Tui(controller: Controller) extends Observer:
 
   def renderAll(): String = {
     val state = controller.gameState
-    val board = List(printHome(state), printField(state), printTarget(state))
+    val board = List(printHome(state), printField(state), printTarget(state), state.errors, state.winner)
+
     board.mkString("\n")
   }
 
