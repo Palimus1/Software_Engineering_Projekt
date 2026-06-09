@@ -7,11 +7,16 @@ case class Player(name: String, color: PlayerColor, pieces: List[Piece], startOf
 
 case class BoardConfig(fieldSize: Int, numPlayers: Int)
 
-case class GameState(players: List[Player], currentPlayerIndex: Int = 0, errors: String = "", winner: String = "", diceRoll: Option[Int] = None, rollAttempt: Int = 0):
+case class GameState(players: List[Player], config: BoardConfig,currentPlayerIndex: Int = 0, errors: String = "", winner: String = "", diceRoll: Option[Int] = None, rollAttempt: Int = 0):
   def currentPlayer: Player = players(currentPlayerIndex)
 
 //Companion Object mit statischer methode um GameState richtig zu initialisieren
 object GameState {
+  
+  def apply(players: List[Player], config: BoardConfig): GameState = {
+    new GameState(players, config)
+  }
+
   def create(playerNames: List[String], config: BoardConfig): GameState = {
 
     //mit namen auffüllen, falls zu wenig angegeben
@@ -34,6 +39,7 @@ object GameState {
       val pieces = (1 to 4).map(id => Piece(id, color, 0)).toList
       Player(name, color, pieces, offset)
     }
-    GameState(players, 0)
+    
+    apply(players, config)
   }
 }

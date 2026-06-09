@@ -5,9 +5,9 @@ import ludo.util.Observable
 
 import scala.io.AnsiColor
 
-class Controller(var gameState: GameState, val config: BoardConfig) extends Observable:
+class Controller(var gameState: GameState) extends Observable:
 
-  private val stepsToHome = config.fieldSize
+  private val stepsToHome = gameState.config.fieldSize
   private val maxPosition = stepsToHome + 4
 
   def doMove(pieceId: Int): Unit = {
@@ -109,7 +109,7 @@ class Controller(var gameState: GameState, val config: BoardConfig) extends Obse
     // val roll = scala.util.Random.between(1, 7)  <--- DIESE ZEILE WIRD GELÖSCHT
     val currentplayer = state.currentPlayer
 
-    val hasActivePiece = currentplayer.pieces.exists(p => p.position > 0 && p.position <= config.fieldSize)
+    val hasActivePiece = currentplayer.pieces.exists(p => p.position > 0 && p.position <= gameState.config.fieldSize)
 
     if (hasActivePiece) {
       if (hasValidMoves(currentplayer, roll)) {
@@ -179,7 +179,7 @@ class Controller(var gameState: GameState, val config: BoardConfig) extends Obse
       None
     } else {
       // Korrekte Modulo-Berechnung für 1-basierte Felder
-      val global = ((piece.position + p.startOffset - 1) % config.fieldSize) + 1
+      val global = ((piece.position + p.startOffset - 1) % gameState.config.fieldSize) + 1
       Some(global)
     }
   }

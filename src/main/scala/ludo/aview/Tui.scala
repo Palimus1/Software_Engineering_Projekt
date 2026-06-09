@@ -50,7 +50,7 @@ case class Tui(controller: Controller) extends Observer:
   private def printTarget(state: GameState): String = {
     //{ }{ }{ }{ }
 
-    val config = controller.config
+    val config = controller.gameState.config
     val playerTargets = state.players.map { player =>
 
 
@@ -77,7 +77,7 @@ case class Tui(controller: Controller) extends Observer:
   }
 
   private def printField(state: GameState): String =
-    val config = controller.config
+    val config = controller.gameState.config
     val range = 1 until (config.fieldSize + 1)
 
     val occupiedFields = for {

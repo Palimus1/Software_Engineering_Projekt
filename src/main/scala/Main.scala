@@ -22,7 +22,7 @@ import scala.io.StdIn
   val initialState = GameState.create(playerNames, config)
 
   // Der Controller verwaltet den State
-  val controller = Controller(initialState, config)
+  val controller = Controller(initialState)
 
   // Die TUI meldet sich beim Erstellen automatisch als Observer an
   val tui = Tui(controller)
