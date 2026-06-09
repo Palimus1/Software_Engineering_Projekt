@@ -100,13 +100,13 @@ class Controller(var gameState: GameState, val config: BoardConfig) extends Obse
     }
   }
 
-  def rollDice(): Unit = {
-    gameState = rollDiceLogic(gameState)
+  def rollDice(roll: Int = scala.util.Random.between(1, 7)): Unit = {
+    gameState = rollDiceLogic(gameState, roll)
     notifyObservers()
   }
 
-  private def rollDiceLogic(state: GameState): GameState = {
-    val roll = scala.util.Random.between(1, 7)
+  private def rollDiceLogic(state: GameState, roll: Int): GameState = {
+    // val roll = scala.util.Random.between(1, 7)  <--- DIESE ZEILE WIRD GELÖSCHT
     val currentplayer = state.currentPlayer
 
     val hasActivePiece = currentplayer.pieces.exists(p => p.position > 0 && p.position <= config.fieldSize)
