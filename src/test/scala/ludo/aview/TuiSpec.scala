@@ -46,5 +46,26 @@ class TuiSpec extends AnyWordSpec with Matchers {
       val output = tui.processInput()
       output should include(s"|${AnsiColor.BLUE}B1${AnsiColor.RESET}|")
     }
+
+    "call update() and print to console when the controller state changes" in {
+      // Wir bereiten einen Stream vor, der die Konsolenausgabe abfängt
+      val stream = new java.io.ByteArrayOutputStream()
+
+      // Console.withOut lenkt alle print() Befehle in unseren Stream um
+      Console.withOut(stream) {
+        // Wir schmuggeln eine 6 in den State, damit der Zug gültig ist
+        controller.gameState = controller.gameState.copy(diceRoll = Some(6))
+
+        // doMove() ändert den State -> ruft notifyObservers() auf -> ruft tui.update() auf -> ruft print() auf!
+        controller.doMove(1)
+      }
+
+      // Jetzt holen wir uns den abgefangenen Text als String
+      val consoleOutput = stream.toString
+
+      // Da Alice (Blau) gerade Figur 1 aus der Base aufs Feld bewegt hat,
+      // muss die Figur jetzt im neu gezeichneten Board-String auftauchen.
+      consoleOutput should include(s"|${AnsiColor.BLUE}B1${AnsiColor.RESET}|")
+    }
   }
 }
