@@ -11,22 +11,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'sbt'
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'sbt'
 
-      - name: Run Tests and generate Coverage
-        run: sbt clean coverage test coverageReport
+    # DAS HIER IST NEU: Installiert das sbt-Kommando
+    - name: Setup sbt
+      uses: sbt/setup-sbt@v1
 
-      - name: Upload Coverage to Coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        run: sbt coveralls
+    - name: Run Tests and generate Coverage
+      run: sbt clean coverage test coverageReport
 
-      - name: Run Mutation Tests (Stryker4s)
-        run: sbt stryker
+    - name: Upload Coverage to Coveralls
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: sbt coveralls
+
+    - name: Run Mutation Tests (Stryker4s)
+      run: sbt stryker
