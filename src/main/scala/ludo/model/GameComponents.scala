@@ -7,8 +7,18 @@ case class Player(name: String, color: PlayerColor, pieces: List[Piece], startOf
 
 case class BoardConfig(fieldSize: Int, numPlayers: Int)
 
-case class GameState(players: List[Player], config: BoardConfig,currentPlayerIndex: Int = 0, errors: String = "", winner: String = "", diceRoll: Option[Int] = None, rollAttempt: Int = 0):
+case class GameState(players: List[Player], config: BoardConfig,currentPlayerIndex: Int = 0,
+                     errors: String = "", winner: String = "", diceRoll: Option[Int] = None,
+                     rollAttempt: Int = 0, phase: GamePhase = RollingPhase):
   def currentPlayer: Player = players(currentPlayerIndex)
+
+  def getGlobalPosition(p: Player, piece: Piece): Option[Int] = {
+    if (piece.position <= 0 || piece.position > config.fieldSize) {
+      None
+    } else {
+      Some(((piece.position + p.startOffset - 1) % config.fieldSize) + 1)
+    }
+  }
 
 //Companion Object mit statischer methode um GameState richtig zu initialisieren
 object GameState {

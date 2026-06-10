@@ -83,7 +83,7 @@ case class Tui(controller: Controller) extends Observer:
     val occupiedFields = for {
       p <- state.players
       piece <- p.pieces
-      globalPos <- controller.getGlobalPosition(p, piece)
+      globalPos <- state.getGlobalPosition(p, piece)
     } yield globalPos -> (p, piece)
     /*
     yield gibt hier eine Liste mit geschachtelten Tupeln: (pos -> (player, piece))
