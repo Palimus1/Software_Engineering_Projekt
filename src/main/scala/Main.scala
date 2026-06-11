@@ -17,7 +17,7 @@ import scala.io.StdIn
   println("Bitte die Feldgroeße (Standard 40): ")
   val fieldSize = StdIn.readLine().toIntOption.getOrElse(40)
 
-  println("Wähle einen Spielmodus aus: Standart-Modus(ENTER)  ---  Blitz-Modus(Blitz)")
+  println("Waehle einen Spielmodus aus: Standart-Modus(ENTER)  ---  Blitz-Modus(Blitz)")
   val mode = StdIn.readLine().trim.toLowerCase
 
   val selectedStrategy = mode match {
@@ -26,11 +26,11 @@ import scala.io.StdIn
       QuickWinStrategy
 
     case "" | "standard" | "standart" => // "" ist das reine ENTER-Drücken
-      println("🐢 Standard-Modus aktiviert! Alle 4 Figuren müssen ins Ziel.")
+      println("🐢 Standard-Modus aktiviert! Alle 4 Figuren muessen ins Ziel.")
       StandardWinStrategy
 
     case _ => // Der Unterstrich ist der "catch-all" (alles andere)
-      println("Ungültige Eingabe. Wir starten zur Sicherheit den Standard-Modus.")
+      println("Ungueltige Eingabe. Wir starten zur Sicherheit den Standard-Modus.")
       StandardWinStrategy
   }
 
@@ -77,9 +77,8 @@ def gameLoop(controller: Controller): Unit = {
 
   state.diceRoll.foreach(roll => println(s"🎲 Du hast eine $roll gewuerfelt!"))
 
-  print("Aktion waehlen -> 'w' (Wuerfeln), '1'-'4' (Figur bewegen), 'q' (Beenden): ")
+  print("Aktion waehlen -> 'w' (Wuerfeln), '1'-'4' (Figur bewegen), 'u' (Undo), 'r' (Redo), 'q' (Beenden): ")
   val input = StdIn.readLine().trim.toLowerCase
-
 
   input match {
     case "q" =>
@@ -89,9 +88,12 @@ def gameLoop(controller: Controller): Unit = {
       controller.rollDice()
     case "1" | "2" | "3" | "4" =>
       controller.doMove(input.toInt)
+    case "u" =>
+      controller.undo()
+    case "r" =>
+      controller.redo()
     case _ =>
-      // Das ist nur ein TUI-Fehler, kein Spiel-Fehler
-      println("Ungueltige Eingabe! Bitte 'w', '1'-'4' oder 'q' eingeben.")
+      println("Ungueltige Eingabe! Bitte 'w', '1'-'4', 'u', 'r' oder 'q' eingeben.")
   }
 
   gameLoop(controller)
