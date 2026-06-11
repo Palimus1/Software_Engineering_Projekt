@@ -5,7 +5,7 @@ case class Piece(id: Int, color: PlayerColor, position: Int)
 
 case class Player(name: String, color: PlayerColor, pieces: List[Piece], startOffset: Int)
 
-case class BoardConfig(fieldSize: Int, numPlayers: Int)
+case class BoardConfig(fieldSize: Int, numPlayers: Int, winStrategy: WinStrategy = StandardWinStrategy)
 
 case class GameState(players: List[Player], config: BoardConfig,currentPlayerIndex: Int = 0,
                      errors: String = "", winner: String = "", diceRoll: Option[Int] = None,

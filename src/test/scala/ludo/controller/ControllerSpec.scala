@@ -98,7 +98,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
         controller.doMove(3)
 
-        controller.gameState.errors should include("Startfeld freiräumen")
+        controller.gameState.errors should include("Startfeld freiraeumen")
       }
 
       "not move the piece if it would move the piece outside the board (overshoot)" in {
@@ -110,7 +110,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         controller.doMove(1)
 
         controller.gameState.players.head.pieces.head.position should be (40)
-        controller.gameState.errors should include("überschreitet das Ziel")
+        controller.gameState.errors should include("ueberschreitet das Ziel")
       }
 
       "not allow moving to a field occupied by own piece" in {
@@ -147,6 +147,26 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
         controller.gameState.winner should include("gewonnen")
       }
+      "declare a winner instantly in Blitz mode (QuickWinStrategy) when only one piece reaches the target" in {
+        // Wir erstellen eine Config explizit für den Blitz-Modus!
+        val configBlitz = BoardConfig(40, 2, QuickWinStrategy)
+
+        // Alice hat nur EINE Figur kurz vorm Ziel (Feld 40), der Rest ist noch in der Base
+        val pieces = List(Piece(1, PlayerColor.Blue, 40), Piece(2, PlayerColor.Blue, 0), Piece(3, PlayerColor.Blue, 0), Piece(4, PlayerColor.Blue, 0))
+        val players = List(Player("Alice", PlayerColor.Blue, pieces, 0), initialState.players(1))
+
+        // Spielstatus: Wir haben eine 4 gewürfelt und sind in der MovingPhase
+        val state = GameState(players, configBlitz, diceRoll = Some(4), phase = MovingPhase)
+        val controller = Controller(state)
+
+        // Wir ziehen Figur 1 von Feld 40 auf Feld 44 (ins Ziel)
+        controller.doMove(1)
+
+        // Der Controller muss sofort den Gewinn auslösen, obwohl Figur 2, 3 und 4 noch in der Base sind!
+        controller.gameState.winner should include("gewonnen")
+        controller.gameState.phase should be(GameOverPhase)
+      }
+
     }
 
     "rolling the dice (rollDiceLogic)" should {
@@ -226,7 +246,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         // Wir versuchen direkt zu ziehen, ohne vorher zu würfeln:
         controller.doMove(1)
 
-        controller.gameState.errors should include("Du musst erst würfeln!")
+        controller.gameState.errors should include("Du musst erst wuerfeln!")
       }
 
       "reject a dice roll if the player already rolled (MovingPhase)" in {
@@ -236,7 +256,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         // Jetzt versuchen wir, NOCHMAL zu würfeln:
         controller.rollDice(3)
 
-        controller.gameState.errors should include("Du hast schon gewürfelt")
+        controller.gameState.errors should include("Du hast schon gewuerfelt")
       }
 
       "reject any rolls or moves if the game is already over (GameOverPhase)" in {

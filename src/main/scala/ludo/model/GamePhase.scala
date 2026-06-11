@@ -18,8 +18,6 @@ trait GamePhase {
     }
   }
 
-
-
   protected def hasValidMoves(player: Player, roll: Int, state: GameState): Boolean = {
     player.pieces.exists { p =>
       val relPos = calculatePos(p.position, roll, state)
@@ -30,10 +28,10 @@ trait GamePhase {
   }
 }
 
-// Zustand 1: Man muss würfeln
+// Zustand 1: Man muss wuerfeln
 object RollingPhase extends GamePhase {
   override def handleMove(state: GameState, pieceId: Int): GameState = {
-    state.copy(errors = "Du musst erst würfeln!")
+    state.copy(errors = "Du musst erst wuerfeln!")
   }
 
   override def handleRoll(state: GameState, roll: Int): GameState = {
@@ -49,7 +47,7 @@ object RollingPhase extends GamePhase {
         val nextPlayerIndex = (state.currentPlayerIndex + 1) % state.players.size
         state.copy(
           currentPlayerIndex = nextPlayerIndex, diceRoll = None, rollAttempt = 0,
-          errors = s"Eine $roll gewürfelt, aber alle Figuren sind blockiert! Nächster Spieler.",
+          errors = s"Eine $roll gewuerfelt, aber alle Figuren sind blockiert! Naechster Spieler.",
           phase = RollingPhase // Bleibt in der RollingPhase für den nächsten Spieler
         )
       }
@@ -62,14 +60,14 @@ object RollingPhase extends GamePhase {
           val newRollAttempt = state.rollAttempt + 1
           state.copy(
             rollAttempt = newRollAttempt,
-            errors = s"Eine $roll gewürfelt! Kein gültiger Zug. Du hast noch ${3 - newRollAttempt} Versuch(e) übrig.",
+            errors = s"Eine $roll gewuerfelt! Kein gueltiger Zug. Du hast noch ${3 - newRollAttempt} Versuch(e) uebrig.",
             phase = RollingPhase
           )
         } else {
           val nextPlayerIndex = (state.currentPlayerIndex + 1) % state.players.size
           state.copy(
             currentPlayerIndex = nextPlayerIndex, rollAttempt = 0, diceRoll = None,
-            errors = s"Eine $roll gewürfelt. Dreimal keinen Zug gehabt. Nächster Spieler ist dran.",
+            errors = s"Eine $roll gewuerfelt. Dreimal keinen Zug gehabt. Naechster Spieler ist dran.",
             phase = RollingPhase
           )
         }
@@ -81,7 +79,7 @@ object RollingPhase extends GamePhase {
 // Zustand 2: Man muss eine Figur bewegen
 object MovingPhase extends GamePhase {
   override def handleRoll(state: GameState, roll: Int): GameState = {
-    state.copy(errors = "Du hast schon gewürfelt! Bitte bewege eine Figur (1-4).")
+    state.copy(errors = "Du hast schon gewuerfelt! Bitte bewege eine Figur (1-4).")
   }
 
   override def handleMove(state: GameState, pieceId: Int): GameState = {
@@ -90,7 +88,7 @@ object MovingPhase extends GamePhase {
 
     currentplayer.pieces.find(_.id == pieceId) match {
       case None =>
-        state.copy(errors = "Die Figuren sind mit 1-4 indiziert! Bitte erneut wählen.")
+        state.copy(errors = "Die Figuren sind mit 1-4 indiziert! Bitte erneut waehlen.")
 
       case Some(pieceToMove) =>
         val relPos = calculatePos(pieceToMove.position, movedBy, state)
@@ -103,11 +101,11 @@ object MovingPhase extends GamePhase {
         val isStartBlocked = currentplayer.pieces.exists(p => p.position == 1)
         val isInvalidBaseMove = pieceToMove.position == 0 && movedBy != 6
 
-        if (isInvalidBaseMove) state.copy(errors = "Du brauchst eine 6 um die Base zu verlassen! Bitte erneut wählen.")
-        else if (movedBy == 6 && hasPieceInBase && pieceToMove.position != 0 && !isStartBlocked) state.copy(errors = "Du musst eine Figur aus der Base bewegen! Bitte erneut wählen.")
-        else if (movedBy == 6 && hasPieceInBase && pieceToMove.position != 1 && isStartBlocked) state.copy(errors = "Du musst das Startfeld freiräumen! Bitte erneut wählen.")
-        else if (isOvershooting) state.copy(errors = "Der Zug überschreitet das Ziel! Bitte erneut wählen.")
-        else if (isBlocked) state.copy(errors = "Du kannst deine eigenen Figuren nicht schlagen! Bitte erneut wählen.")
+        if (isInvalidBaseMove) state.copy(errors = "Du brauchst eine 6 um die Base zu verlassen! Bitte erneut waehlen.")
+        else if (movedBy == 6 && hasPieceInBase && pieceToMove.position != 0 && !isStartBlocked) state.copy(errors = "Du musst eine Figur aus der Base bewegen! Bitte erneut waehlen.")
+        else if (movedBy == 6 && hasPieceInBase && pieceToMove.position != 1 && isStartBlocked) state.copy(errors = "Du musst das Startfeld freiraeumen! Bitte erneut waehlen.")
+        else if (isOvershooting) state.copy(errors = "Der Zug ueberschreitet das Ziel! Bitte erneut waehlen.")
+        else if (isBlocked) state.copy(errors = "Du kannst deine eigenen Figuren nicht schlagen! Bitte erneut waehlen.")
         else {
           val updatedPlayers = state.players.map { player =>
             if (player == currentplayer) {
@@ -122,10 +120,10 @@ object MovingPhase extends GamePhase {
 
           val nextPlayerIndex = if (movedBy == 6) state.currentPlayerIndex else (state.currentPlayerIndex + 1) % state.players.size
           val updatedCurrentPlayer = updatedPlayers(state.currentPlayerIndex)
-          val isWinner = updatedCurrentPlayer.pieces.forall(p => p.position > state.config.fieldSize)
+          val isWinner = state.config.winStrategy.isWinner(updatedCurrentPlayer, state.config.fieldSize)
 
           if (isWinner) {
-            val winnerText = s"Glückwunsch! ${currentplayer.name}(${currentplayer.color.ansiCode}${currentplayer.color}${AnsiColor.RESET}) hat das Spiel gewonnen!"
+            val winnerText = s"Glueckwunsch! ${currentplayer.name}(${currentplayer.color.ansiCode}${currentplayer.color}${AnsiColor.RESET}) hat das Spiel gewonnen!"
             state.copy(players = updatedPlayers, currentPlayerIndex = nextPlayerIndex, errors = "", winner = winnerText, diceRoll = None, rollAttempt = 0, phase = GameOverPhase) // <--- Spielende!
           } else {
             state.copy(players = updatedPlayers, currentPlayerIndex = nextPlayerIndex, errors = "", diceRoll = None, rollAttempt = 0, phase = RollingPhase) // <--- Zurück zum Würfeln!
