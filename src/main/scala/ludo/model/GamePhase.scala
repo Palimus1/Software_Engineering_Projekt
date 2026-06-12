@@ -2,7 +2,7 @@ package ludo.model
 
 import scala.io.AnsiColor
 
-// Das ist dein State-Interface
+
 trait GamePhase {
   def handleRoll(state: GameState, roll: Int): GameState
   def handleMove(state: GameState, pieceId: Int): GameState
@@ -133,7 +133,7 @@ object MovingPhase extends GamePhase {
   }
 }
 
-// Zustand 3: Das Spiel ist vorbei
+
 object GameOverPhase extends GamePhase {
   override def handleRoll(state: GameState, roll: Int): GameState = state.copy(errors = "Das Spiel ist bereits vorbei!")
   override def handleMove(state: GameState, pieceId: Int): GameState = state.copy(errors = "Das Spiel ist bereits vorbei!")

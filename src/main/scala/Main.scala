@@ -25,31 +25,31 @@ import scala.io.StdIn
       println("Blitz-Modus aktiviert! Wer zuerst eine Figur im Ziel hat, gewinnt.")
       QuickWinStrategy
 
-    case "" | "standard" | "standart" => // "" ist das reine ENTER-Drücken
+    case "" | "standard" | "standart" => //
       println("🐢 Standard-Modus aktiviert! Alle 4 Figuren muessen ins Ziel.")
       StandardWinStrategy
 
-    case _ => // Der Unterstrich ist der "catch-all" (alles andere)
+    case _ =>
       println("Ungueltige Eingabe. Wir starten zur Sicherheit den Standard-Modus.")
       StandardWinStrategy
   }
 
 
-  // 2. MVC Komponenten initialisieren
+
   val config = BoardConfig(fieldSize, numPlayers, selectedStrategy)
   val initialState = GameState.create(playerNames, config)
 
-  // Der Controller verwaltet den State
+
   val controller = Controller(initialState)
 
-  // Die TUI meldet sich beim Erstellen automatisch als Observer an
+
   val tui = Tui(controller)
 
-  // Einmaliges manuelles Anzeigen zum Start
+
   println("\nSpiel startet!")
   tui.update()
 
-  // 3. Start der Spielschleife
+
   gameLoop(controller)
 }
 

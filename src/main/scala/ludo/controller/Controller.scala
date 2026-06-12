@@ -8,13 +8,11 @@ class Controller(var gameState: GameState) extends Observable:
   private val undoManager = new UndoManager
 
   def rollDice(roll: Int = scala.util.Random.between(1, 7)): Unit = {
-    // FEHLER BEHOBEN: Wir rufen den UndoManager auf, statt den State selbst zu ändern!
     undoManager.doStep(new RollCommand(roll, this))
     notifyObservers()
   }
 
   def doMove(pieceId: Int): Unit = {
-    // FEHLER BEHOBEN: Wir rufen den UndoManager auf, statt den State selbst zu ändern!
     undoManager.doStep(new MoveCommand(pieceId, this))
     notifyObservers()
   }
