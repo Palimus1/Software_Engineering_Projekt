@@ -1,6 +1,7 @@
 import ludo.model.*
 import ludo.controller.Controller
 import ludo.aview.Tui
+import ludo.aview.Gui
 import scala.annotation.tailrec
 import scala.io.StdIn
 
@@ -15,10 +16,17 @@ import scala.io.StdIn
   val playerNames = collectNames(numPlayers, Nil)
 
   println("Bitte die Feldgroeße (Standard 40): ")
-  val fieldSize = StdIn.readLine().toIntOption.getOrElse(40)
+  val rawFieldSize = StdIn.readLine().toIntOption.getOrElse(40)
+  
+  // immer eine gerade Anzahl an Feldern
+  val fieldSize = if (rawFieldSize < 4) 4 else if (rawFieldSize % 2 != 0) rawFieldSize + 1 else rawFieldSize
+  
+  if (rawFieldSize != fieldSize) {
+    println(s"-> Feldgroeße automatisch auf $fieldSize angepasst (Ein Rechteck erfordert eine gerade Feldanzahl).")
+  }
 
   println("Wähle einen Spielmodus aus: Standart-Modus(ENTER)  ---  Blitz-Modus(Blitz)")
-  val mode = StdIn.readLine().trim.toLowerCase
+  val mode = StdIn.readLine().trim.toLowerCase()
 
   val selectedStrategy = mode match {
     case "blitz" =>
@@ -44,6 +52,7 @@ import scala.io.StdIn
 
   // Die TUI meldet sich beim Erstellen automatisch als Observer an
   val tui = Tui(controller)
+  val gui = new Gui(controller)
 
   // Einmaliges manuelles Anzeigen zum Start
   println("\nSpiel startet!")
@@ -78,7 +87,7 @@ def gameLoop(controller: Controller): Unit = {
   state.diceRoll.foreach(roll => println(s"🎲 Du hast eine $roll gewuerfelt!"))
 
   print("Aktion waehlen -> 'w' (Wuerfeln), '1'-'4' (Figur bewegen), 'q' (Beenden): ")
-  val input = StdIn.readLine().trim.toLowerCase
+  val input = StdIn.readLine().trim.toLowerCase()
 
 
   input match {
