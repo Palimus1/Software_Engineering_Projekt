@@ -29,9 +29,9 @@ object GameState {
 
   def create(playerNames: List[String], config: BoardConfig): GameState = {
 
-    //mit namen auffüllen, falls zu wenig angegeben
+
     val defaults = List("PC 1", "PC 2", "PC 3", "PC 4")
-    // Nur so viele Namen nehmen, wie in config erlaubt
+
     val limitedNames = playerNames
       .padTo(config.numPlayers, "")
       .zip(defaults)

@@ -273,5 +273,56 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         controller.gameState.errors should include("bereits vorbei")
       }
     }
+    "using the Undo/Redo Mechanism (Command Pattern)" should {
+
+      "safely handle undo and redo when the history is empty" in {
+        val controller = Controller(initialState)
+        // Sollte einfach nichts tun und nicht abstürzen (Testet 'case Nil' im UndoManager)
+        controller.undo()
+        controller.redo()
+
+        controller.gameState should be(initialState)
+      }
+
+      "undo and redo a dice roll (RollCommand)" in {
+        val controller = Controller(initialState)
+        val stateBefore = controller.gameState
+
+        // 1. Wir würfeln (Speichert RollCommand im UndoManager)
+        controller.rollDice(6)
+        controller.gameState.diceRoll should be(Some(6))
+        controller.gameState.phase should be(MovingPhase)
+
+        // 2. Wir machen den Wurf rückgängig (Testet RollCommand.undoStep)
+        controller.undo()
+        controller.gameState should be(stateBefore) // Wieder in der RollingPhase, kein Würfel-Wert
+
+        // 3. Wir stellen den Wurf wieder her (Testet RollCommand.redoStep)
+        controller.redo()
+        controller.gameState.diceRoll should be(Some(6))
+        controller.gameState.phase should be(MovingPhase)
+      }
+
+      "undo and redo a piece move (MoveCommand)" in {
+        val controller = Controller(initialState)
+        // Wir bereiten das Spiel künstlich vor, damit wir sofort ziehen können
+        controller.gameState = controller.gameState.copy(diceRoll = Some(6), phase = MovingPhase)
+        val stateBeforeMove = controller.gameState
+
+        // 1. Wir ziehen die Figur (Speichert MoveCommand im UndoManager)
+        controller.doMove(1)
+        controller.gameState.players(0).pieces(0).position should be(1) // Figur ist auf Feld 1
+
+        // 2. Wir machen den Zug rückgängig (Testet MoveCommand.undoStep)
+        controller.undo()
+        controller.gameState should be(stateBeforeMove)
+        controller.gameState.players(0).pieces(0).position should be(0) // Figur ist wieder in der Base
+
+        // 3. Wir stellen den Zug wieder her (Testet MoveCommand.redoStep)
+        controller.redo()
+        controller.gameState.players(0).pieces(0).position should be(1) // Figur ist wieder auf Feld 1
+      }
+    }
   }
+
 }
