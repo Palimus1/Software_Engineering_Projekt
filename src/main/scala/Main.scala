@@ -14,7 +14,7 @@ import scala.io.StdIn
   println(s"Bitte gib die Namen fuer $numPlayers Spieler ein:")
   val playerNames = collectNames(numPlayers, Nil)
 
-  println("Bitte die Feldgroeße (Standard 40): ")
+  println("Bitte die Feldgroesse (Standard 40): ")
   val fieldSize = StdIn.readLine().toIntOption.getOrElse(40)
 
   println("Waehle einen Spielmodus aus: Standart-Modus(ENTER)  ---  Blitz-Modus(Blitz)")
