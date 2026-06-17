@@ -8,7 +8,6 @@ import scala.io.StdIn
 @main def main(): Unit = {
   println("Willkommen zu Mensch aerger dich nicht\n")
 
-  // 1. Setup / Konfiguration abfragen
   println("Bitte die Anzahl Spieler angeben (1-4): ")
   val numPlayers = StdIn.readLine().toIntOption.getOrElse(4)
 
@@ -18,7 +17,6 @@ import scala.io.StdIn
   println("Bitte die Feldgroesse (Standard 40): ")
   val rawFieldSize = StdIn.readLine().toIntOption.getOrElse(40)
 
-  // immer eine gerade Anzahl an Feldern
   val fieldSize = if (rawFieldSize < 4) 4 else if (rawFieldSize % 2 != 0) rawFieldSize + 1 else rawFieldSize
 
   if (rawFieldSize != fieldSize) {
@@ -42,22 +40,16 @@ import scala.io.StdIn
       StandardWinStrategy
   }
 
-
-
   val config = BoardConfig(fieldSize, numPlayers, selectedStrategy)
   val initialState = GameState.create(playerNames, config)
 
-
   val controller = Controller(initialState)
-
 
   val tui = Tui(controller)
   val gui = new Gui(controller)
 
-
   println("\nSpiel startet!")
   tui.update()
-
 
   gameLoop(controller)
 }
@@ -80,19 +72,13 @@ def gameLoop(controller: Controller): Unit = {
     return
   }
 
-  val currPlayer = state.currentPlayer
 
-  println(s"\nAktueller Spieler: ${currPlayer.name} (${currPlayer.color})")
-
-  state.diceRoll.foreach(roll => println(s"🎲 Du hast eine $roll gewuerfelt!"))
-
-  print("Aktion waehlen -> 'w' (Wuerfeln), '1'-'4' (Figur bewegen), 'u' (Undo), 'r' (Redo), 'q' (Beenden): ")
   val input = StdIn.readLine().trim.toLowerCase
 
   input match {
     case "q" =>
       println("Spiel wird beendet.")
-      return
+      sys.exit(0)
     case "w" =>
       controller.rollDice()
     case "1" | "2" | "3" | "4" =>
@@ -101,6 +87,8 @@ def gameLoop(controller: Controller): Unit = {
       controller.undo()
     case "r" =>
       controller.redo()
+    case "" =>
+    // Fängt leere Enter-Tasten ab, macht einfach nichts
     case _ =>
       println("Ungueltige Eingabe! Bitte 'w', '1'-'4', 'u', 'r' oder 'q' eingeben.")
   }

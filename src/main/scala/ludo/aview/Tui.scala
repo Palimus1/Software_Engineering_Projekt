@@ -18,24 +18,39 @@ case class Tui(controller: Controller) extends Observer:
 
   def renderAll(): String = {
     val state = controller.gameState
-    // filter(_.nonEmpty) verhindert leere Zeilenbrüche, wenn z.B. kein Fehler da ist
-    val board = List(printHome(state), printField(state), printTarget(state), errorMessage(state), state.message, state.winner)
-    board.filter(_.nonEmpty).mkString("\n") + "\n"
+
+    val playerStr = s"\nAktueller Spieler: ${state.currentPlayer.name} (${state.currentPlayer.color})"
+    val rollStr = state.diceRoll.map(roll => s"🎲 Du hast eine $roll gewuerfelt!").getOrElse("")
+
+    val board = List(
+      playerStr,
+      rollStr,
+      printHome(state),
+      printField(state),
+      printTarget(state),
+      errorMessage(state),
+      state.message,
+      state.winner
+    )
+
+    val prompt = "TUI-Eingabe ('w'=Wuerfeln, '1-4'=Ziehen, 'u'=Undo, 'r'=Redo, 'q'=Quit): "
+
+    // Wir fügen den Prompt am Ende an, ohne Zeilenumbruch danach, damit der Cursor dort stehen bleibt.
+    board.filter(_.nonEmpty).mkString("\n") + "\n" + prompt
   }
 
-  // --- NEU: Die TUI übersetzt die Exceptions in Text ---
   private def errorMessage(state: GameState): String = {
     state.lastError match {
-      case Some(_: NeedSixException) => s"${AnsiColor.RED} Du brauchst eine 6, um die Base zu verlassen!${AnsiColor.RESET}"
-      case Some(_: BlockedException) => s"${AnsiColor.RED} Du kannst deine eigenen Figuren nicht schlagen!${AnsiColor.RESET}"
-      case Some(_: OvershootException) => s"${AnsiColor.RED} Der Zug ueberschreitet das Ziel!${AnsiColor.RESET}"
-      case Some(_: InvalidPieceException) => s"${AnsiColor.RED} Die Figuren sind mit 1-4 indiziert! Bitte erneut waehlen.${AnsiColor.RESET}"
-      case Some(_: AlreadyRolledException) => s"${AnsiColor.RED} Du hast schon gewuerfelt! Bitte bewege eine Figur.${AnsiColor.RESET}"
-      case Some(_: MustRollFirstException) => s"${AnsiColor.RED} Du musst erst wuerfeln!${AnsiColor.RESET}"
-      case Some(_: GameOverException) => s"${AnsiColor.RED} Das Spiel ist bereits vorbei!${AnsiColor.RESET}"
-      case Some(_: BaseClearException) => s"${AnsiColor.RED} Du musst das Startfeld freiraeumen!${AnsiColor.RESET}"
-      case Some(_: BaseLeaveException) => s"${AnsiColor.RED} Du musst eine Figur aus der Base bewegen!${AnsiColor.RESET}"
-      case Some(e: Throwable) => s"${AnsiColor.RED} Ein Fehler ist aufgetreten: ${e.getMessage}${AnsiColor.RESET}"
+      case Some(_: NeedSixException) => s"${AnsiColor.RED}❌ Du brauchst eine 6, um die Base zu verlassen!${AnsiColor.RESET}"
+      case Some(_: BlockedException) => s"${AnsiColor.RED}❌ Du kannst deine eigenen Figuren nicht schlagen!${AnsiColor.RESET}"
+      case Some(_: OvershootException) => s"${AnsiColor.RED}❌ Der Zug ueberschreitet das Ziel!${AnsiColor.RESET}"
+      case Some(_: InvalidPieceException) => s"${AnsiColor.RED}❌ Die Figuren sind mit 1-4 indiziert! Bitte erneut waehlen.${AnsiColor.RESET}"
+      case Some(_: AlreadyRolledException) => s"${AnsiColor.RED}❌ Du hast schon gewuerfelt! Bitte bewege eine Figur.${AnsiColor.RESET}"
+      case Some(_: MustRollFirstException) => s"${AnsiColor.RED}❌ Du musst erst wuerfeln!${AnsiColor.RESET}"
+      case Some(_: GameOverException) => s"${AnsiColor.RED}❌ Das Spiel ist bereits vorbei!${AnsiColor.RESET}"
+      case Some(_: BaseClearException) => s"${AnsiColor.RED}❌ Du musst das Startfeld freiraeumen!${AnsiColor.RESET}"
+      case Some(_: BaseLeaveException) => s"${AnsiColor.RED}❌ Du musst eine Figur aus der Base bewegen!${AnsiColor.RESET}"
+      case Some(e: Throwable) => s"${AnsiColor.RED}❌ Ein Fehler ist aufgetreten: ${e.getMessage}${AnsiColor.RESET}"
       case None => ""
     }
   }
