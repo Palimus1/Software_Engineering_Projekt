@@ -31,7 +31,7 @@
       libraryDependencies ++= Seq("base", "controls", "fxml", "graphics", "media", "swing", "web").map(m =>
         "org.openjfx" % s"javafx-$m" % "20.0.2" classifier osName
       ),
-      coverageExcludedFiles := ".*Gui.*",
+      coverageExcludedFiles := ".*Gui.*;.*Main.*",
 
       Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
 
