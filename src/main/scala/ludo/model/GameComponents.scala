@@ -1,5 +1,16 @@
 package ludo.model
 
+sealed trait LudoException extends Exception
+case class NeedSixException() extends LudoException
+case class BlockedException() extends LudoException
+case class OvershootException() extends LudoException
+case class InvalidPieceException() extends LudoException
+case class AlreadyRolledException() extends LudoException
+case class MustRollFirstException() extends LudoException
+case class GameOverException() extends LudoException
+case class BaseClearException() extends LudoException
+case class BaseLeaveException() extends LudoException
+
 
 case class Piece(id: Int, color: PlayerColor, position: Int)
 
@@ -7,9 +18,9 @@ case class Player(name: String, color: PlayerColor, pieces: List[Piece], startOf
 
 case class BoardConfig(fieldSize: Int, numPlayers: Int, winStrategy: WinStrategy = StandardWinStrategy)
 
-case class GameState(players: List[Player], config: BoardConfig,currentPlayerIndex: Int = 0,
-                     errors: String = "", winner: String = "", diceRoll: Option[Int] = None,
-                     rollAttempt: Int = 0, phase: GamePhase = RollingPhase):
+case class GameState(players: List[Player], config: BoardConfig, currentPlayerIndex: Int = 0,
+                     lastError: Option[Throwable] = None, message: String = "", winner: String = "",
+                     diceRoll: Option[Int] = None, rollAttempt: Int = 0, phase: GamePhase = RollingPhase):
   def currentPlayer: Player = players(currentPlayerIndex)
 
   def getGlobalPosition(p: Player, piece: Piece): Option[Int] = {
@@ -28,8 +39,6 @@ object GameState {
   }
 
   def create(playerNames: List[String], config: BoardConfig): GameState = {
-
-
     val defaults = List("PC 1", "PC 2", "PC 3", "PC 4")
 
     val limitedNames = playerNames

@@ -2,15 +2,21 @@ package ludo.controller
 
 import ludo.model.GameState
 import ludo.util.Command
+import scala.util.{Try, Success, Failure}
 
 // Kommando für das Würfeln
 class RollCommand(roll: Int, controller: Controller) extends Command {
-  
+
   private val oldState: GameState = controller.gameState
   private var newState: GameState = controller.gameState
 
   override def doStep(): Unit = {
-    newState = oldState.phase.handleRoll(oldState, roll)
+    oldState.phase.handleRoll(oldState, roll) match {
+      case Success(state) =>
+        newState = state.copy(lastError = None) // Bei Erfolg löschen wir alte Fehler
+      case Failure(exception) =>
+        newState = oldState.copy(lastError = Some(exception), message = "") // Bei Fehler speichern wir die Exception
+    }
     controller.gameState = newState
   }
 
@@ -29,7 +35,12 @@ class MoveCommand(pieceId: Int, controller: Controller) extends Command {
   private var newState: GameState = controller.gameState
 
   override def doStep(): Unit = {
-    newState = oldState.phase.handleMove(oldState, pieceId)
+    oldState.phase.handleMove(oldState, pieceId) match {
+      case Success(state) =>
+        newState = state.copy(lastError = None) // Bei Erfolg löschen wir alte Fehler
+      case Failure(exception) =>
+        newState = oldState.copy(lastError = Some(exception), message = "") // Bei Fehler speichern wir die Exception
+    }
     controller.gameState = newState
   }
 
