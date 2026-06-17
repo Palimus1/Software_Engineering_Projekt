@@ -14,6 +14,9 @@
       name := "Projekt",
       version := "0.1.0-SNAPSHOT",
 
+      fork := true,
+      connectInput := true,
+
       scalaVersion := scala3Version,
       strykerIsSupported := true,
       libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.20",
