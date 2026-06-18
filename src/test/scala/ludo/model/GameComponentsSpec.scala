@@ -13,7 +13,7 @@ class GameComponentsSpec extends AnyWordSpec with Matchers {
         val config = BoardConfig(40, 1)
         val state = GameState(players, config)
 
-        state.currentPlayerIndex should be(0)
+        state.currentPlayerIndex.shouldBe(0)
       }
     }
 
@@ -23,9 +23,9 @@ class GameComponentsSpec extends AnyWordSpec with Matchers {
         val names = List("Alice", "", "   ")
         val state = GameState.create(names, config)
 
-        state.players(0).name should be("Alice")
-        state.players(1).name should be("PC 2")
-        state.players(2).name should be("PC 3")
+        state.players(0).name.shouldBe("Alice")
+        state.players(1).name.shouldBe("PC 2")
+        state.players(2).name.shouldBe("PC 3")
       }
 
       "pad the list with default names if too few names are provided" in {
@@ -33,13 +33,12 @@ class GameComponentsSpec extends AnyWordSpec with Matchers {
         val names = List("Alice", "Bob")
         val state = GameState.create(names, config)
 
-        state.players.size should be(4)
-        state.players(0).name should be("Alice")
-        state.players(1).name should be("Bob")
-        state.players(2).name should be("PC 3")
-        state.players(3).name should be("PC 4")
+        state.players.size.shouldBe(4)
+        state.players(0).name.shouldBe("Alice")
+        state.players(1).name.shouldBe("Bob")
+        state.players(2).name.shouldBe("PC 3")
+        state.players(3).name.shouldBe("PC 4")
       }
     }
-
   }
 }

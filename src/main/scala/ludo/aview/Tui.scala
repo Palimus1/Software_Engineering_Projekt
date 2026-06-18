@@ -1,12 +1,12 @@
 package ludo.aview
 
 import ludo.model.*
-import ludo.controller.Controller
+import ludo.controller.ControllerInterface
 import ludo.util.Observer
 
 import scala.io.AnsiColor
 
-case class Tui(controller: Controller) extends Observer:
+case class Tui(controller: ControllerInterface) extends Observer:
 
   controller.add(this)
 
@@ -20,7 +20,7 @@ case class Tui(controller: Controller) extends Observer:
     val state = controller.gameState
 
     val playerStr = s"\nAktueller Spieler: ${state.currentPlayer.name} (${state.currentPlayer.color})"
-    val rollStr = state.diceRoll.map(roll => s"🎲 Du hast eine $roll gewuerfelt!").getOrElse("")
+    val rollStr = state.diceRoll.map(roll => s"Du hast eine $roll gewuerfelt!").getOrElse("")
 
     val board = List(
       playerStr,
@@ -29,28 +29,48 @@ case class Tui(controller: Controller) extends Observer:
       printField(state),
       printTarget(state),
       errorMessage(state),
-      state.message,
-      state.winner
+      infoMessage(state),
+      winnerMessage(state)
     )
 
     val prompt = "TUI-Eingabe ('w'=Wuerfeln, '1-4'=Ziehen, 'u'=Undo, 'r'=Redo, 'q'=Quit): "
 
     // Wir fügen den Prompt am Ende an, ohne Zeilenumbruch danach, damit der Cursor dort stehen bleibt.
-    board.filter(_.nonEmpty).mkString("\n") + "\n" + prompt
+    board.filter(_.nonEmpty).mkString("\n") + "\n" + prompt + "\n"
+  }
+
+  private def winnerMessage(state: GameState): String = {
+    state.winner match {
+      case Some(player) =>
+        s"\nGlueckwunsch! ${player.name} (${player.color.ansiCode}${player.color}${AnsiColor.RESET}) hat das Spiel gewonnen!"
+      case None => ""
+    }
+  }
+
+  private def infoMessage(state: GameState): String = {
+    state.message match {
+      case Some(AllPiecesBlockedEvent(roll)) =>
+        s"Eine $roll gewuerfelt, aber alle Figuren sind blockiert! Naechster Spieler."
+      case Some(InvalidRollRetryEvent(roll, attemptsLeft)) =>
+        s"Eine $roll gewuerfelt! Kein gueltiger Zug. Du hast noch $attemptsLeft Versuch(e) uebrig."
+      case Some(ThreeStrikesEvent(roll)) =>
+        s"Eine $roll gewuerfelt. Dreimal keinen Zug gehabt. Naechster Spieler ist dran."
+      case None => ""
+    }
   }
 
   private def errorMessage(state: GameState): String = {
     state.lastError match {
-      case Some(_: NeedSixException) => s"${AnsiColor.RED}❌ Du brauchst eine 6, um die Base zu verlassen!${AnsiColor.RESET}"
-      case Some(_: BlockedException) => s"${AnsiColor.RED}❌ Du kannst deine eigenen Figuren nicht schlagen!${AnsiColor.RESET}"
-      case Some(_: OvershootException) => s"${AnsiColor.RED}❌ Der Zug ueberschreitet das Ziel!${AnsiColor.RESET}"
-      case Some(_: InvalidPieceException) => s"${AnsiColor.RED}❌ Die Figuren sind mit 1-4 indiziert! Bitte erneut waehlen.${AnsiColor.RESET}"
-      case Some(_: AlreadyRolledException) => s"${AnsiColor.RED}❌ Du hast schon gewuerfelt! Bitte bewege eine Figur.${AnsiColor.RESET}"
-      case Some(_: MustRollFirstException) => s"${AnsiColor.RED}❌ Du musst erst wuerfeln!${AnsiColor.RESET}"
-      case Some(_: GameOverException) => s"${AnsiColor.RED}❌ Das Spiel ist bereits vorbei!${AnsiColor.RESET}"
-      case Some(_: BaseClearException) => s"${AnsiColor.RED}❌ Du musst das Startfeld freiraeumen!${AnsiColor.RESET}"
-      case Some(_: BaseLeaveException) => s"${AnsiColor.RED}❌ Du musst eine Figur aus der Base bewegen!${AnsiColor.RESET}"
-      case Some(e: Throwable) => s"${AnsiColor.RED}❌ Ein Fehler ist aufgetreten: ${e.getMessage}${AnsiColor.RESET}"
+      case Some(_: NeedSixException) => s"${AnsiColor.RED}Du brauchst eine 6, um die Base zu verlassen!${AnsiColor.RESET}"
+      case Some(_: BlockedException) => s"${AnsiColor.RED}Du kannst deine eigenen Figuren nicht schlagen!${AnsiColor.RESET}"
+      case Some(_: OvershootException) => s"${AnsiColor.RED}Der Zug ueberschreitet das Ziel!${AnsiColor.RESET}"
+      case Some(_: InvalidPieceException) => s"${AnsiColor.RED}Die Figuren sind mit 1-4 indiziert! Bitte erneut waehlen.${AnsiColor.RESET}"
+      case Some(_: AlreadyRolledException) => s"${AnsiColor.RED}Du hast schon gewuerfelt! Bitte bewege eine Figur.${AnsiColor.RESET}"
+      case Some(_: MustRollFirstException) => s"${AnsiColor.RED}Du musst erst wuerfeln!${AnsiColor.RESET}"
+      case Some(_: GameOverException) => s"${AnsiColor.RED}Das Spiel ist bereits vorbei!${AnsiColor.RESET}"
+      case Some(_: BaseClearException) => s"${AnsiColor.RED}Du musst das Startfeld freiraeumen!${AnsiColor.RESET}"
+      case Some(_: BaseLeaveException) => s"${AnsiColor.RED}Du musst eine Figur aus der Base bewegen!${AnsiColor.RESET}"
+      case Some(e: Throwable) => s"${AnsiColor.RED}Ein Fehler ist aufgetreten: ${e.getMessage}${AnsiColor.RESET}"
       case None => ""
     }
   }

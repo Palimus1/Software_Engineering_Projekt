@@ -1,7 +1,7 @@
 package ludo.aview
 
 import ludo.model.*
-import ludo.controller.Controller
+import ludo.controller.ControllerInterface
 import scalafx.Includes.*
 import scalafx.scene.Cursor
 import scalafx.scene.control.Button
@@ -13,7 +13,7 @@ import scalafx.geometry.{Insets, Pos}
 
 object GuiLogic {
 
-  def createRootPane(state: GameState, controller: Controller): Pane = {
+  def createRootPane(state: GameState, controller: ControllerInterface): Pane = {
     val fields = state.config.fieldSize
     val (fRadius, pRadius, gap, fontSz) = fields match {
       case n if n <= 16 => (24.0, 16.0, 15.0, 16)
@@ -102,7 +102,7 @@ object GuiLogic {
     }
   }
 
-  private def createControlPanel(state: GameState, controller: Controller): HBox = {
+  private def createControlPanel(state: GameState, controller: ControllerInterface): HBox = {
     val currPlayerColor = getPlayerColor(state.currentPlayer.color)
     
     val turnInfo = new Text {

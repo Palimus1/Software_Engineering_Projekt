@@ -14,7 +14,7 @@ class ObserverSpec extends AnyWordSpec with Matchers {
 
       observable.add(observer)
       observable.notifyObservers()
-      updated should be(true)
+      updated.shouldBe(true)
     }
 
     "remove observers correctly" in {
@@ -27,7 +27,7 @@ class ObserverSpec extends AnyWordSpec with Matchers {
       observable.add(observer)
       observable.remove(observer)
       observable.notifyObservers()
-      counter should be(0)
+      counter.shouldBe(0)
     }
   }
 }

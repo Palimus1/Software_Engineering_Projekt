@@ -13,9 +13,9 @@ class RollCommand(roll: Int, controller: Controller) extends Command {
   override def doStep(): Unit = {
     oldState.phase.handleRoll(oldState, roll) match {
       case Success(state) =>
-        newState = state.copy(lastError = None) // Bei Erfolg löschen wir alte Fehler
+        newState = state.copy(lastError = None)
       case Failure(exception) =>
-        newState = oldState.copy(lastError = Some(exception), message = "") // Bei Fehler speichern wir die Exception
+        newState = oldState.copy(lastError = Some(exception), message = None) // <--- Geändert auf None
     }
     controller.gameState = newState
   }
@@ -37,9 +37,9 @@ class MoveCommand(pieceId: Int, controller: Controller) extends Command {
   override def doStep(): Unit = {
     oldState.phase.handleMove(oldState, pieceId) match {
       case Success(state) =>
-        newState = state.copy(lastError = None) // Bei Erfolg löschen wir alte Fehler
+        newState = state.copy(lastError = None)
       case Failure(exception) =>
-        newState = oldState.copy(lastError = Some(exception), message = "") // Bei Fehler speichern wir die Exception
+        newState = oldState.copy(lastError = Some(exception), message = None) // <--- Geändert auf None
     }
     controller.gameState = newState
   }

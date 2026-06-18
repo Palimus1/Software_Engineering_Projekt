@@ -1,6 +1,6 @@
 package ludo.aview
 
-import ludo.controller.Controller
+import ludo.controller.ControllerInterface
 import ludo.util.Observer
 import scalafx.application.Platform
 import scalafx.Includes.*
@@ -8,7 +8,7 @@ import scalafx.scene.Scene
 import scalafx.scene.paint.Color
 import scalafx.stage.Stage
 
-class Gui(controller: Controller) extends Observer {
+class Gui(controller: ControllerInterface) extends Observer {
   
   controller.add(this)
 

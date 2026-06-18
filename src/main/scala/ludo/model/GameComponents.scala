@@ -11,6 +11,11 @@ case class GameOverException() extends LudoException
 case class BaseClearException() extends LudoException
 case class BaseLeaveException() extends LudoException
 
+// --- NEU: Unsere typisierten Info-Events! ---
+sealed trait GameEvent
+case class AllPiecesBlockedEvent(roll: Int) extends GameEvent
+case class InvalidRollRetryEvent(roll: Int, attemptsLeft: Int) extends GameEvent
+case class ThreeStrikesEvent(roll: Int) extends GameEvent
 
 case class Piece(id: Int, color: PlayerColor, position: Int)
 
@@ -18,8 +23,9 @@ case class Player(name: String, color: PlayerColor, pieces: List[Piece], startOf
 
 case class BoardConfig(fieldSize: Int, numPlayers: Int, winStrategy: WinStrategy = StandardWinStrategy)
 
+// --- ANGEPASST: message als Option[GameEvent] und winner als Option[Player] ---
 case class GameState(players: List[Player], config: BoardConfig, currentPlayerIndex: Int = 0,
-                     lastError: Option[Throwable] = None, message: String = "", winner: String = "",
+                     lastError: Option[Throwable] = None, message: Option[GameEvent] = None, winner: Option[Player] = None,
                      diceRoll: Option[Int] = None, rollAttempt: Int = 0, phase: GamePhase = RollingPhase):
   def currentPlayer: Player = players(currentPlayerIndex)
 
@@ -31,9 +37,8 @@ case class GameState(players: List[Player], config: BoardConfig, currentPlayerIn
     }
   }
 
-//Companion Object mit statischer methode um GameState richtig zu initialisieren
 object GameState {
-  
+
   def apply(players: List[Player], config: BoardConfig): GameState = {
     new GameState(players, config)
   }
@@ -51,14 +56,11 @@ object GameState {
 
     val colors = List(PlayerColor.Blue, PlayerColor.Red, PlayerColor.Green, PlayerColor.Yellow)
 
-    // zip kombiniert nur so viele Elemente, wie in der kürzeren Liste sind
     val players = limitedNames.zip(colors).zipWithIndex.map { case ((name, color), index) =>
-      // Offset-Berechnung bleibt dynamisch
       val offset = Math.round(index.toDouble * config.fieldSize.toDouble / config.numPlayers.toDouble).toInt
       val pieces = (1 to 4).map(id => Piece(id, color, 0)).toList
       Player(name, color, pieces, offset)
     }
-    
     apply(players, config)
   }
 }

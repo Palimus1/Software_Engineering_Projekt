@@ -1,5 +1,5 @@
 import ludo.model.*
-import ludo.controller.Controller
+import ludo.controller.{Controller, ControllerInterface}
 import ludo.aview.Tui
 import ludo.aview.Gui
 import scala.annotation.tailrec
@@ -43,7 +43,7 @@ import scala.io.StdIn
   val config = BoardConfig(fieldSize, numPlayers, selectedStrategy)
   val initialState = GameState.create(playerNames, config)
 
-  val controller = Controller(initialState)
+  val controller: ControllerInterface = Controller(initialState)
 
   val tui = Tui(controller)
   val gui = new Gui(controller)
@@ -64,7 +64,7 @@ def collectNames(remaining: Int, acc: List[String]): List[String] = {
 }
 
 @tailrec
-def gameLoop(controller: Controller): Unit = {
+def gameLoop(controller: ControllerInterface): Unit = {
 
   val state = controller.gameState
 

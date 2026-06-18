@@ -4,7 +4,6 @@ import scala.io.AnsiColor
 import scala.util.{Try, Success, Failure}
 
 trait GamePhase {
-  // Rückgabetyp ist jetzt Try[GameState]
   def handleRoll(state: GameState, roll: Int): Try[GameState]
   def handleMove(state: GameState, pieceId: Int): Try[GameState]
 
@@ -40,31 +39,31 @@ object RollingPhase extends GamePhase {
 
     if (hasActivePiece) {
       if (hasValidMoves(currentplayer, roll, state)) {
-        Success(state.copy(diceRoll = Some(roll), rollAttempt = 0, message = "", phase = MovingPhase))
+        Success(state.copy(diceRoll = Some(roll), rollAttempt = 0, message = None, phase = MovingPhase))
       } else {
         val nextPlayerIndex = (state.currentPlayerIndex + 1) % state.players.size
         Success(state.copy(
           currentPlayerIndex = nextPlayerIndex, diceRoll = None, rollAttempt = 0,
-          message = s"Eine $roll gewuerfelt, aber alle Figuren sind blockiert! Naechster Spieler.",
+          message = Some(AllPiecesBlockedEvent(roll)),
           phase = RollingPhase
         ))
       }
     } else {
       if (roll == 6 || hasValidMoves(currentplayer, roll, state)) {
-        Success(state.copy(diceRoll = Some(roll), rollAttempt = 0, message = "", phase = MovingPhase))
+        Success(state.copy(diceRoll = Some(roll), rollAttempt = 0, message = None, phase = MovingPhase))
       } else {
         if (state.rollAttempt < 2) {
           val newRollAttempt = state.rollAttempt + 1
           Success(state.copy(
             rollAttempt = newRollAttempt,
-            message = s"Eine $roll gewuerfelt! Kein gueltiger Zug. Du hast noch ${3 - newRollAttempt} Versuch(e) uebrig.",
+            message = Some(InvalidRollRetryEvent(roll, 3 - newRollAttempt)),
             phase = RollingPhase
           ))
         } else {
           val nextPlayerIndex = (state.currentPlayerIndex + 1) % state.players.size
           Success(state.copy(
             currentPlayerIndex = nextPlayerIndex, rollAttempt = 0, diceRoll = None,
-            message = s"Eine $roll gewuerfelt. Dreimal keinen Zug gehabt. Naechster Spieler ist dran.",
+            message = Some(ThreeStrikesEvent(roll)),
             phase = RollingPhase
           ))
         }
@@ -119,10 +118,9 @@ object MovingPhase extends GamePhase {
           val isWinner = state.config.winStrategy.isWinner(updatedCurrentPlayer, state.config.fieldSize)
 
           if (isWinner) {
-            val winnerText = s"Glueckwunsch! ${currentplayer.name}(${currentplayer.color.ansiCode}${currentplayer.color}${AnsiColor.RESET}) hat das Spiel gewonnen!"
-            Success(state.copy(players = updatedPlayers, currentPlayerIndex = nextPlayerIndex, message = "", lastError = None, winner = winnerText, diceRoll = None, rollAttempt = 0, phase = GameOverPhase))
+            Success(state.copy(players = updatedPlayers, currentPlayerIndex = nextPlayerIndex, message = None, lastError = None, winner = Some(updatedCurrentPlayer), diceRoll = None, rollAttempt = 0, phase = GameOverPhase))
           } else {
-            Success(state.copy(players = updatedPlayers, currentPlayerIndex = nextPlayerIndex, message = "", lastError = None, diceRoll = None, rollAttempt = 0, phase = RollingPhase))
+            Success(state.copy(players = updatedPlayers, currentPlayerIndex = nextPlayerIndex, message = None, lastError = None, diceRoll = None, rollAttempt = 0, phase = RollingPhase))
           }
         }
     }
