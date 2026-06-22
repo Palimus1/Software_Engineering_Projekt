@@ -1,9 +1,10 @@
 package ludo.controller
 
-import ludo.controller.impl.Controller
 import ludo.model.*
+import ludo.controller.impl.Controller
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
+import scala.util.{Failure, Success} // Neuer Import
 
 class ControllerSpec extends AnyWordSpec with Matchers {
   "A Controller" when {
@@ -29,7 +30,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         controller.rollDice(3)
 
         controller.gameState.diceRoll.shouldBe(Some(3))
-        controller.gameState.lastError.shouldBe(None)
+        controller.gameState.lastError.shouldBe(Success(())) // HIER ANGEPASST
       }
 
       "allow a move if there are no active pieces, a non-6 is rolled, but a piece in the home area can still move" in {
@@ -40,7 +41,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         controller.rollDice(2)
 
         controller.gameState.diceRoll.shouldBe(Some(2))
-        controller.gameState.lastError.shouldBe(None)
+        controller.gameState.lastError.shouldBe(Success(())) // HIER ANGEPASST
       }
 
       "evaluate the isBlocked condition inside hasValidMoves" in {
@@ -71,7 +72,8 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
         controller.doMove(5)
 
-        controller.gameState.lastError.get.shouldBe(a[InvalidPieceException])
+        // HIER ANGEPASST: .failed.get holt direkt die Exception aus dem Failure
+        controller.gameState.lastError.failed.get.shouldBe(a[InvalidPieceException])
       }
 
       "not move a piece out of base if not a 6 is rolled" in {
@@ -81,7 +83,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         controller.doMove(1)
 
         controller.gameState.players(0).pieces(0).position.shouldBe(0)
-        controller.gameState.lastError.get.shouldBe(a[NeedSixException])
+        controller.gameState.lastError.failed.get.shouldBe(a[NeedSixException]) // HIER ANGEPASST
       }
 
       "force a player to move out of base if a 6 is rolled and the start field is clear" in {
@@ -92,7 +94,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
         controller.doMove(1)
 
-        controller.gameState.lastError.get.shouldBe(a[BaseLeaveException])
+        controller.gameState.lastError.failed.get.shouldBe(a[BaseLeaveException]) // HIER ANGEPASST
       }
 
       "force a player to clear the start field if a 6 is rolled and start is blocked by own piece" in {
@@ -103,7 +105,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
         controller.doMove(3)
 
-        controller.gameState.lastError.get.shouldBe(a[BaseClearException])
+        controller.gameState.lastError.failed.get.shouldBe(a[BaseClearException]) // HIER ANGEPASST
       }
 
       "not move the piece if it would move the piece outside the board (overshoot)" in {
@@ -115,7 +117,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         controller.doMove(1)
 
         controller.gameState.players.head.pieces.head.position.shouldBe(40)
-        controller.gameState.lastError.get.shouldBe(a[OvershootException])
+        controller.gameState.lastError.failed.get.shouldBe(a[OvershootException]) // HIER ANGEPASST
       }
 
       "not allow moving to a field occupied by own piece" in {
@@ -126,7 +128,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
         controller.doMove(1)
 
-        controller.gameState.lastError.get.shouldBe(a[BlockedException])
+        controller.gameState.lastError.failed.get.shouldBe(a[BlockedException]) // HIER ANGEPASST
         controller.gameState.players.head.pieces.head.position.shouldBe(5)
       }
 
@@ -151,7 +153,6 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
         controller.doMove(4)
 
-        // HIER GEÄNDERT: Prüfen auf Option[Player] anstatt String
         controller.gameState.winner.isDefined.shouldBe(true)
         controller.gameState.winner.get.name.shouldBe("Alice")
       }
@@ -165,7 +166,6 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
         controller.doMove(1)
 
-        // HIER GEÄNDERT: Prüfen auf Option[Player] anstatt String
         controller.gameState.winner.isDefined.shouldBe(true)
         controller.gameState.winner.get.name.shouldBe("Alice")
         controller.gameState.phase.shouldBe(GameOverPhase)
@@ -248,7 +248,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       "reject a move if the player hasn't rolled the dice yet (RollingPhase)" in {
         val controller: ControllerInterface = new Controller(initialState)
         controller.doMove(1)
-        controller.gameState.lastError.get.shouldBe(a[MustRollFirstException])
+        controller.gameState.lastError.failed.get.shouldBe(a[MustRollFirstException]) // HIER ANGEPASST
       }
 
       "reject a dice roll if the player already rolled (MovingPhase)" in {
@@ -256,7 +256,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         val controller: ControllerInterface = new Controller(state)
 
         controller.rollDice(3)
-        controller.gameState.lastError.get.shouldBe(a[AlreadyRolledException])
+        controller.gameState.lastError.failed.get.shouldBe(a[AlreadyRolledException]) // HIER ANGEPASST
       }
 
       "reject any rolls or moves if the game is already over (GameOverPhase)" in {
@@ -264,10 +264,10 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         val controller: ControllerInterface = new Controller(state)
 
         controller.rollDice(5)
-        controller.gameState.lastError.get.shouldBe(a[GameOverException])
+        controller.gameState.lastError.failed.get.shouldBe(a[GameOverException]) // HIER ANGEPASST
 
         controller.doMove(1)
-        controller.gameState.lastError.get.shouldBe(a[GameOverException])
+        controller.gameState.lastError.failed.get.shouldBe(a[GameOverException]) // HIER ANGEPASST
       }
     }
 

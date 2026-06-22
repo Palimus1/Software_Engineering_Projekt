@@ -1,6 +1,5 @@
 package ludo.controller.impl
 
-import ludo.controller.impl.Controller
 import ludo.model.GameState
 import ludo.util.Command
 
@@ -15,9 +14,9 @@ class RollCommand(roll: Int, controller: Controller) extends Command {
   override def doStep(): Unit = {
     oldState.phase.handleRoll(oldState, roll) match {
       case Success(state) =>
-        newState = state.copy(lastError = None)
+        newState = state.copy(lastError = Success(())) 
       case Failure(exception) =>
-        newState = oldState.copy(lastError = Some(exception), message = None) // <--- Geändert auf None
+        newState = oldState.copy(lastError = Failure(exception), message = None)
     }
     controller.gameState = newState
   }
@@ -39,9 +38,9 @@ class MoveCommand(pieceId: Int, controller: Controller) extends Command {
   override def doStep(): Unit = {
     oldState.phase.handleMove(oldState, pieceId) match {
       case Success(state) =>
-        newState = state.copy(lastError = None)
+        newState = state.copy(lastError = Success(()))
       case Failure(exception) =>
-        newState = oldState.copy(lastError = Some(exception), message = None) // <--- Geändert auf None
+        newState = oldState.copy(lastError = Failure(exception), message = None)
     }
     controller.gameState = newState
   }

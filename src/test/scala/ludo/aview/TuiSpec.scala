@@ -1,18 +1,18 @@
 package ludo.aview
 
 import ludo.model.*
-import ludo.controller.ControllerInterface
 import ludo.controller.impl.Controller
+import ludo.controller.ControllerInterface
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import scala.io.AnsiColor
+import scala.util.{Failure, Success} // Neuer Import
 
 class TuiSpec extends AnyWordSpec with Matchers {
   "A TUI" should {
     val config = BoardConfig(40, 2)
     val state = GameState.create(List("Alice", "Bob"), config)
 
-    // HIER DIE ÄNDERUNG: "given" statt "val" und leere Tui()
     given controller: ControllerInterface = new Controller(state)
     val tui = Tui()
 
@@ -79,7 +79,8 @@ class TuiSpec extends AnyWordSpec with Matchers {
       )
 
       for ((exception, expectedText) <- errorCases) {
-        val errState = state.copy(lastError = Some(exception))
+        // HIER ANGEPASST: Failure(exception) statt Some(exception)
+        val errState = state.copy(lastError = Failure(exception))
         given errController: ControllerInterface = new Controller(errState)
         val errTui = Tui()
 
@@ -88,7 +89,8 @@ class TuiSpec extends AnyWordSpec with Matchers {
         output.should(include(AnsiColor.RED))
       }
 
-      val cleanState = state.copy(lastError = None)
+      // HIER ANGEPASST: Success(()) statt None
+      val cleanState = state.copy(lastError = Success(()))
       given cleanController: ControllerInterface = new Controller(cleanState)
       val cleanTui = Tui()
 

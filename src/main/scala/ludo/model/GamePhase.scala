@@ -7,7 +7,7 @@ trait GamePhase {
   def handleRoll(state: GameState, roll: Int): Try[GameState]
   def handleMove(state: GameState, pieceId: Int): Try[GameState]
 
-  protected def maxPosition(state: GameState): Int = state.config.fieldSize + 4
+  private def maxPosition(state: GameState): Int = state.config.fieldSize + 4
 
   protected def calculatePos(curr: Int, moved: Int, state: GameState): Int = {
     curr match {
@@ -118,9 +118,9 @@ object MovingPhase extends GamePhase {
           val isWinner = state.config.winStrategy.isWinner(updatedCurrentPlayer, state.config.fieldSize)
 
           if (isWinner) {
-            Success(state.copy(players = updatedPlayers, currentPlayerIndex = nextPlayerIndex, message = None, lastError = None, winner = Some(updatedCurrentPlayer), diceRoll = None, rollAttempt = 0, phase = GameOverPhase))
+            Success(state.copy(players = updatedPlayers, currentPlayerIndex = nextPlayerIndex, message = None, lastError = Success(()), winner = Some(updatedCurrentPlayer), diceRoll = None, rollAttempt = 0, phase = GameOverPhase))
           } else {
-            Success(state.copy(players = updatedPlayers, currentPlayerIndex = nextPlayerIndex, message = None, lastError = None, diceRoll = None, rollAttempt = 0, phase = RollingPhase))
+            Success(state.copy(players = updatedPlayers, currentPlayerIndex = nextPlayerIndex, message = None, lastError = Success(()), diceRoll = None, rollAttempt = 0, phase = RollingPhase))
           }
         }
     }

@@ -5,7 +5,7 @@ import ludo.controller.ControllerInterface
 import ludo.util.Observer
 
 import scala.io.AnsiColor
-
+import scala.util.{Success, Failure} // Neuer Import
 
 case class Tui()(using controller: ControllerInterface) extends Observer:
 
@@ -59,19 +59,20 @@ case class Tui()(using controller: ControllerInterface) extends Observer:
     }
   }
 
+
   private def errorMessage(state: GameState): String = {
     state.lastError match {
-      case Some(_: NeedSixException) => s"${AnsiColor.RED}Du brauchst eine 6, um die Base zu verlassen!${AnsiColor.RESET}"
-      case Some(_: BlockedException) => s"${AnsiColor.RED}Du kannst deine eigenen Figuren nicht schlagen!${AnsiColor.RESET}"
-      case Some(_: OvershootException) => s"${AnsiColor.RED}Der Zug ueberschreitet das Ziel!${AnsiColor.RESET}"
-      case Some(_: InvalidPieceException) => s"${AnsiColor.RED}Die Figuren sind mit 1-4 indiziert! Bitte erneut waehlen.${AnsiColor.RESET}"
-      case Some(_: AlreadyRolledException) => s"${AnsiColor.RED}Du hast schon gewuerfelt! Bitte bewege eine Figur.${AnsiColor.RESET}"
-      case Some(_: MustRollFirstException) => s"${AnsiColor.RED}Du musst erst wuerfeln!${AnsiColor.RESET}"
-      case Some(_: GameOverException) => s"${AnsiColor.RED}Das Spiel ist bereits vorbei!${AnsiColor.RESET}"
-      case Some(_: BaseClearException) => s"${AnsiColor.RED}Du musst das Startfeld freiraeumen!${AnsiColor.RESET}"
-      case Some(_: BaseLeaveException) => s"${AnsiColor.RED}Du musst eine Figur aus der Base bewegen!${AnsiColor.RESET}"
-      case Some(e: Throwable) => s"${AnsiColor.RED}Ein Fehler ist aufgetreten: ${e.getMessage}${AnsiColor.RESET}"
-      case None => ""
+      case Failure(_: NeedSixException) => s"${AnsiColor.RED}Du brauchst eine 6, um die Base zu verlassen!${AnsiColor.RESET}"
+      case Failure(_: BlockedException) => s"${AnsiColor.RED}Du kannst deine eigenen Figuren nicht schlagen!${AnsiColor.RESET}"
+      case Failure(_: OvershootException) => s"${AnsiColor.RED}Der Zug ueberschreitet das Ziel!${AnsiColor.RESET}"
+      case Failure(_: InvalidPieceException) => s"${AnsiColor.RED}Die Figuren sind mit 1-4 indiziert! Bitte erneut waehlen.${AnsiColor.RESET}"
+      case Failure(_: AlreadyRolledException) => s"${AnsiColor.RED}Du hast schon gewuerfelt! Bitte bewege eine Figur.${AnsiColor.RESET}"
+      case Failure(_: MustRollFirstException) => s"${AnsiColor.RED}Du musst erst wuerfeln!${AnsiColor.RESET}"
+      case Failure(_: GameOverException) => s"${AnsiColor.RED}Das Spiel ist bereits vorbei!${AnsiColor.RESET}"
+      case Failure(_: BaseClearException) => s"${AnsiColor.RED}Du musst das Startfeld freiraeumen!${AnsiColor.RESET}"
+      case Failure(_: BaseLeaveException) => s"${AnsiColor.RED}Du musst eine Figur aus der Base bewegen!${AnsiColor.RESET}"
+      case Failure(e: Throwable) => s"${AnsiColor.RED}Ein Fehler ist aufgetreten: ${e.getMessage}${AnsiColor.RESET}"
+      case Success(_) => "" // Der leere Success-Fall
     }
   }
 

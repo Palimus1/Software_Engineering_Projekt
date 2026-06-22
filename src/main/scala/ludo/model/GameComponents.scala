@@ -1,5 +1,7 @@
 package ludo.model
 
+import scala.util.{Try, Success, Failure} // <--- WICHTIG: Neuer Import!
+
 sealed trait LudoException extends Exception
 case class NeedSixException() extends LudoException
 case class BlockedException() extends LudoException
@@ -11,7 +13,6 @@ case class GameOverException() extends LudoException
 case class BaseClearException() extends LudoException
 case class BaseLeaveException() extends LudoException
 
-// --- NEU: Unsere typisierten Info-Events! ---
 sealed trait GameEvent
 case class AllPiecesBlockedEvent(roll: Int) extends GameEvent
 case class InvalidRollRetryEvent(roll: Int, attemptsLeft: Int) extends GameEvent
@@ -23,9 +24,9 @@ case class Player(name: String, color: PlayerColor, pieces: List[Piece], startOf
 
 case class BoardConfig(fieldSize: Int, numPlayers: Int, winStrategy: WinStrategy = StandardWinStrategy)
 
-// --- ANGEPASST: message als Option[GameEvent] und winner als Option[Player] ---
+
 case class GameState(players: List[Player], config: BoardConfig, currentPlayerIndex: Int = 0,
-                     lastError: Option[Throwable] = None, message: Option[GameEvent] = None, winner: Option[Player] = None,
+                     lastError: Try[Unit] = Success(()), message: Option[GameEvent] = None, winner: Option[Player] = None,
                      diceRoll: Option[Int] = None, rollAttempt: Int = 0, phase: GamePhase = RollingPhase):
   def currentPlayer: Player = players(currentPlayerIndex)
 
