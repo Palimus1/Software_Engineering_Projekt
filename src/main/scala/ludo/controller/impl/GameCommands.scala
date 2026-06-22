@@ -1,8 +1,10 @@
-package ludo.controller
+package ludo.controller.impl
 
+import ludo.controller.impl.Controller
 import ludo.model.GameState
 import ludo.util.Command
-import scala.util.{Try, Success, Failure}
+
+import scala.util.{Failure, Success, Try}
 
 // Kommando für das Würfeln
 class RollCommand(roll: Int, controller: Controller) extends Command {

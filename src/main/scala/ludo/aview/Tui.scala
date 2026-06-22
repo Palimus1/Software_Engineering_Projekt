@@ -6,7 +6,8 @@ import ludo.util.Observer
 
 import scala.io.AnsiColor
 
-case class Tui(controller: ControllerInterface) extends Observer:
+
+case class Tui()(using controller: ControllerInterface) extends Observer:
 
   controller.add(this)
 
@@ -35,7 +36,6 @@ case class Tui(controller: ControllerInterface) extends Observer:
 
     val prompt = "TUI-Eingabe ('w'=Wuerfeln, '1-4'=Ziehen, 'u'=Undo, 'r'=Redo, 'q'=Quit): "
 
-    // Wir fügen den Prompt am Ende an, ohne Zeilenumbruch danach, damit der Cursor dort stehen bleibt.
     board.filter(_.nonEmpty).mkString("\n") + "\n" + prompt + "\n"
   }
 

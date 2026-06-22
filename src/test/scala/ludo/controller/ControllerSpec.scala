@@ -1,5 +1,6 @@
 package ludo.controller
 
+import ludo.controller.impl.Controller
 import ludo.model.*
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers

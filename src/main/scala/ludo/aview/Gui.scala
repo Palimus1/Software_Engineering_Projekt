@@ -8,8 +8,8 @@ import scalafx.scene.Scene
 import scalafx.scene.paint.Color
 import scalafx.stage.Stage
 
-class Gui(controller: ControllerInterface) extends Observer {
-  
+class Gui()(using controller: ControllerInterface) extends Observer {
+
   controller.add(this)
 
   private var mainStage: Stage = null
@@ -21,7 +21,7 @@ class Gui(controller: ControllerInterface) extends Observer {
       height = 800
       scene = new Scene {
         fill = Color.web("#f4f4f4")
-        root = GuiLogic.createRootPane(controller.gameState, controller)
+        root = GuiLogic.createRootPane(controller.gameState)
       }
     }
     mainStage.show()
@@ -30,7 +30,7 @@ class Gui(controller: ControllerInterface) extends Observer {
   override def update(): Unit = {
     Platform.runLater(() => {
       if (mainStage != null && mainStage.scene.value != null) {
-        mainStage.scene.value.root = GuiLogic.createRootPane(controller.gameState, controller)
+        mainStage.scene.value.root = GuiLogic.createRootPane(controller.gameState)
       }
     })
   }

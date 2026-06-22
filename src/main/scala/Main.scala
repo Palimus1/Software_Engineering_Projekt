@@ -1,7 +1,9 @@
 import ludo.model.*
-import ludo.controller.{Controller, ControllerInterface}
+import ludo.controller.ControllerInterface
 import ludo.aview.Tui
 import ludo.aview.Gui
+import ludo.controller.impl.Controller
+import ludo.LudoModule // Wichtig für die DI
 import scala.annotation.tailrec
 import scala.io.StdIn
 
@@ -31,7 +33,7 @@ import scala.io.StdIn
       println("Blitz-Modus aktiviert! Wer zuerst eine Figur im Ziel hat, gewinnt.")
       QuickWinStrategy
 
-    case "" | "standard" | "standart" => //
+    case "" | "standard" | "standart" =>
       println("🐢 Standard-Modus aktiviert! Alle 4 Figuren muessen ins Ziel.")
       StandardWinStrategy
 
@@ -43,15 +45,22 @@ import scala.io.StdIn
   val config = BoardConfig(fieldSize, numPlayers, selectedStrategy)
   val initialState = GameState.create(playerNames, config)
 
-  val controller: ControllerInterface = Controller(initialState)
+  // --- DEPENDENCY INJECTION START ---
+  // 1. Wir packen den initialen State in das Modul
+  val module = new LudoModule(initialState)
 
-  val tui = Tui(controller)
-  val gui = new Gui(controller)
+  // 2. Wir importieren das 'given', damit Scala es für 'using' finden kann
+  import module.given
+
+  // 3. Instanziierung via DI: Keine manuellen Parameter mehr nötig!
+  val tui = Tui()
+  val gui = new Gui()
+  // --- DEPENDENCY INJECTION ENDE ---
 
   println("\nSpiel startet!")
   tui.update()
 
-  gameLoop(controller)
+  gameLoop() // Parameter komplett entfernt!
 }
 
 @tailrec
@@ -63,15 +72,15 @@ def collectNames(remaining: Int, acc: List[String]): List[String] = {
   }
 }
 
+// Nutzt jetzt 'using', um sich den Controller vollautomatisch injecten zu lassen
 @tailrec
-def gameLoop(controller: ControllerInterface): Unit = {
+def gameLoop()(using controller: ControllerInterface): Unit = {
 
   val state = controller.gameState
 
   if (state.phase == GameOverPhase) {
     return
   }
-
 
   val input = StdIn.readLine().trim.toLowerCase
 
@@ -88,10 +97,9 @@ def gameLoop(controller: ControllerInterface): Unit = {
     case "r" =>
       controller.redo()
     case "" =>
-    // Fängt leere Enter-Tasten ab, macht einfach nichts
     case _ =>
       println("Ungueltige Eingabe! Bitte 'w', '1'-'4', 'u', 'r' oder 'q' eingeben.")
   }
 
-  gameLoop(controller)
+  gameLoop() // Rekursiver Aufruf ohne Parameter
 }

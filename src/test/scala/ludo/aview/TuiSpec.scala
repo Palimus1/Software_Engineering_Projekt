@@ -1,7 +1,8 @@
 package ludo.aview
 
 import ludo.model.*
-import ludo.controller.{Controller, ControllerInterface}
+import ludo.controller.ControllerInterface
+import ludo.controller.impl.Controller
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import scala.io.AnsiColor
@@ -11,8 +12,9 @@ class TuiSpec extends AnyWordSpec with Matchers {
     val config = BoardConfig(40, 2)
     val state = GameState.create(List("Alice", "Bob"), config)
 
-    val controller: ControllerInterface = new Controller(state)
-    val tui = Tui(controller)
+    // HIER DIE ÄNDERUNG: "given" statt "val" und leere Tui()
+    given controller: ControllerInterface = new Controller(state)
+    val tui = Tui()
 
     "render the home base correctly" in {
       val output = tui.processInput()
@@ -25,8 +27,8 @@ class TuiSpec extends AnyWordSpec with Matchers {
       val players = List(Player("Stella", PlayerColor.Blue, pieces, 0))
       val targetState = GameState(players, targetConfig)
 
-      val targetController: ControllerInterface = new Controller(targetState)
-      val targetTui = Tui(targetController)
+      given targetController: ControllerInterface = new Controller(targetState)
+      val targetTui = Tui()
 
       val output = targetTui.processInput()
       output.should(include(s"{${AnsiColor.BLUE}B1${AnsiColor.RESET}}"))
@@ -40,8 +42,8 @@ class TuiSpec extends AnyWordSpec with Matchers {
           )
         )
       )
-      val testController: ControllerInterface = new Controller(testState)
-      val testTui = Tui(testController)
+      given testController: ControllerInterface = new Controller(testState)
+      val testTui = Tui()
 
       val output = testTui.processInput()
       output.should(include(s"|${AnsiColor.BLUE}B1${AnsiColor.RESET}|"))
@@ -51,8 +53,8 @@ class TuiSpec extends AnyWordSpec with Matchers {
       val stream = new java.io.ByteArrayOutputStream()
 
       val testState = state.copy(diceRoll = Some(6), phase = MovingPhase)
-      val testController: ControllerInterface = new Controller(testState)
-      val testTui = Tui(testController)
+      given testController: ControllerInterface = new Controller(testState)
+      val testTui = Tui()
 
       Console.withOut(stream) {
         testController.doMove(1)
@@ -78,18 +80,17 @@ class TuiSpec extends AnyWordSpec with Matchers {
 
       for ((exception, expectedText) <- errorCases) {
         val errState = state.copy(lastError = Some(exception))
-        val errController: ControllerInterface = new Controller(errState)
-        val errTui = Tui(errController)
+        given errController: ControllerInterface = new Controller(errState)
+        val errTui = Tui()
 
         val output = errTui.processInput()
         output.should(include(expectedText))
         output.should(include(AnsiColor.RED))
       }
 
-      // Test für den fehlerfreien Fall (None) - Ohne Fehler darf kein Fehler-Text auftauchen
       val cleanState = state.copy(lastError = None)
-      val cleanController: ControllerInterface = new Controller(cleanState)
-      val cleanTui = Tui(cleanController)
+      given cleanController: ControllerInterface = new Controller(cleanState)
+      val cleanTui = Tui()
 
       val cleanOutput = cleanTui.processInput()
       cleanOutput.shouldNot(include("Du brauchst eine 6"))
@@ -105,8 +106,8 @@ class TuiSpec extends AnyWordSpec with Matchers {
 
       for ((event, expectedText) <- events) {
         val eventState = state.copy(message = Some(event))
-        val eventController: ControllerInterface = new Controller(eventState)
-        val eventTui = Tui(eventController)
+        given eventController: ControllerInterface = new Controller(eventState)
+        val eventTui = Tui()
 
         val output = eventTui.processInput()
         output.should(include(expectedText))
@@ -116,8 +117,8 @@ class TuiSpec extends AnyWordSpec with Matchers {
     "print a congratulatory message when a player wins" in {
       val winnerPlayer = state.players.head
       val winState = state.copy(winner = Some(winnerPlayer))
-      val winController: ControllerInterface = new Controller(winState)
-      val winTui = Tui(winController)
+      given winController: ControllerInterface = new Controller(winState)
+      val winTui = Tui()
 
       val output = winTui.processInput()
       output.should(include(s"Glueckwunsch! ${winnerPlayer.name}"))

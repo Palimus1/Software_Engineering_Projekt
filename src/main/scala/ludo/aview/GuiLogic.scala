@@ -13,7 +13,7 @@ import scalafx.geometry.{Insets, Pos}
 
 object GuiLogic {
 
-  def createRootPane(state: GameState, controller: ControllerInterface): Pane = {
+  def createRootPane(state: GameState)(using controller: ControllerInterface): Pane = {
     val fields = state.config.fieldSize
     val (fRadius, pRadius, gap, fontSz) = fields match {
       case n if n <= 16 => (24.0, 16.0, 15.0, 16)
@@ -35,7 +35,7 @@ object GuiLogic {
       val (col, row) = layout.calculateGridCoordinates(i)
       val fieldColor = getFieldBaseColor(i, state)
       val strokeColor = getFieldStrokeColor(i, state)
-      
+
       val occupants = for {
         p <- state.players
         piece <- p.pieces
@@ -56,11 +56,11 @@ object GuiLogic {
 
     for (p <- state.players) {
       val baseColor = getPlayerColor(p.color)
-      
+
       for (i <- 1 to 4) {
         val (tCol, tRow) = layout.calculateAlignedTargetCoordinates(p.startOffset, i - 1)
         val tPieceOpt = p.pieces.find(piece => piece.position == layout.totalFields + i)
-        
+
         val tNode = tPieceOpt match {
           case Some(piece) =>
             val clickable = isPieceClickable(state, p, piece)
@@ -72,7 +72,7 @@ object GuiLogic {
 
         val (bCol, bRow) = layout.calculateAlignedBaseCoordinates(p.startOffset, i - 1)
         val bPieceOpt = p.pieces.find(piece => piece.id == i && piece.position == 0)
-        
+
         val bNode = bPieceOpt match {
           case Some(piece) =>
             val clickable = isPieceClickable(state, p, piece)
@@ -93,8 +93,8 @@ object GuiLogic {
       GridPane.setHalignment(nameText, javafx.geometry.HPos.CENTER)
       boardGrid.children.add(nameText)
     }
-    
-    val controlPanel = createControlPanel(state, controller)
+
+    val controlPanel = createControlPanel(state)
 
     new BorderPane {
       center = boardGrid
@@ -102,17 +102,17 @@ object GuiLogic {
     }
   }
 
-  private def createControlPanel(state: GameState, controller: ControllerInterface): HBox = {
+  private def createControlPanel(state: GameState)(using controller: ControllerInterface): HBox = {
     val currPlayerColor = getPlayerColor(state.currentPlayer.color)
-    
+
     val turnInfo = new Text {
       text = s"Am Zug: ${state.currentPlayer.name}"
       style = "-fx-font-weight: bold; -fx-font-size: 20px;"
       fill = currPlayerColor
     }
 
-    val rollButton = new Button("🎲 Würfeln") {
-      style = "-fx-font-size: 16px; -fx-font-weight: bold;"
+    val rollButton = new Button("🎲") {
+      style = "-fx-font-size: 24px; -fx-font-weight: bold;"
       cursor = Cursor.Hand
       onAction = _ => controller.rollDice()
     }
@@ -197,7 +197,7 @@ object GuiLogic {
   }
 
   private def createOccupiedFieldNode(bgColor: Color, pieceColor: Color, strokeColor: Color, label: String, fRadius: Double, pRadius: Double, fontSz: Int, isClickable: Boolean, onClick: () => Unit): StackPane = {
-    val pieceOpacity = if (isClickable) 1.0 else 0.4 
+    val pieceOpacity = if (isClickable) 1.0 else 0.4
     val stack = new StackPane {
       children = Seq(
         new Circle { radius = fRadius; fill = bgColor; stroke = strokeColor; strokeWidth = if (strokeColor == Color.DarkGray) 2 else 5 },

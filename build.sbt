@@ -21,8 +21,9 @@
       strykerIsSupported := true,
       libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.20",
       libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.20" % "test",
-      
-      scalacOptions ++= Seq(
+      libraryDependencies += "net.codingwell" %% "scala-guice" % "7.0.0",
+
+        scalacOptions ++= Seq(
         "-deprecation",
         "-Wconf:msg=Implicit parameters should be provided with a `using` clause:s"
       ),
@@ -31,7 +32,7 @@
       libraryDependencies ++= Seq("base", "controls", "fxml", "graphics", "media", "swing", "web").map(m =>
         "org.openjfx" % s"javafx-$m" % "20.0.2" classifier osName
       ),
-      coverageExcludedFiles := ".*Main;.*Gui;.*GuiLogic",
+      coverageExcludedFiles := ".*Main;.*Gui;.*GuiLogic;.*ControllerInterface",
       coverageExcludedPackages := "",
 
       Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,

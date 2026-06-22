@@ -1,5 +1,6 @@
-package ludo.controller
+package ludo.controller.impl
 
+import ludo.controller.ControllerInterface
 import ludo.model.*
 import ludo.util.{Observable, UndoManager}
 
