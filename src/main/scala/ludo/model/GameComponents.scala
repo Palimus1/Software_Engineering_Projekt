@@ -1,6 +1,8 @@
 package ludo.model
 
-import scala.util.{Try, Success, Failure} // <--- WICHTIG: Neuer Import!
+import ludo.model.memento.*
+
+import scala.util.{Failure, Success, Try} // <--- WICHTIG: Neuer Import!
 
 sealed trait LudoException extends Exception
 case class NeedSixException() extends LudoException
@@ -28,6 +30,7 @@ case class BoardConfig(fieldSize: Int, numPlayers: Int, winStrategy: WinStrategy
 case class GameState(players: List[Player], config: BoardConfig, currentPlayerIndex: Int = 0,
                      lastError: Try[Unit] = Success(()), message: Option[GameEvent] = None, winner: Option[Player] = None,
                      diceRoll: Option[Int] = None, rollAttempt: Int = 0, phase: GamePhase = RollingPhase):
+
   def currentPlayer: Player = players(currentPlayerIndex)
 
   def getGlobalPosition(p: Player, piece: Piece): Option[Int] = {
@@ -36,6 +39,33 @@ case class GameState(players: List[Player], config: BoardConfig, currentPlayerIn
     } else {
       Some(((piece.position + p.startOffset - 1) % config.fieldSize) + 1)
     }
+  }
+
+  def createMemento(): GameStateMemento = {
+    GameStateMemento(
+      players = this.players.map(player =>
+        PlayerMemento(
+          name = player.name,
+          color = player.color.toString,
+          startOffset = player.startOffset,
+          pieces = player.pieces.map(piece =>
+            PieceMemento(
+              id = piece.id,
+              color = piece.color.toString,
+              position = piece.position
+            )
+          )
+        )
+      ),
+      fieldSize = this.config.fieldSize,
+      numPlayers = this.config.numPlayers,
+      winStrategy = this.config.winStrategy.name,
+      currentPlayerIndex = this.currentPlayerIndex,
+      winnerColor = this.winner.map(_.color.toString), //gibt bei None wieder None?
+      diceRoll = this.diceRoll,
+      rollAttempt = this.rollAttempt,
+      phase = this.phase.name
+    )
   }
 
 object GameState {
@@ -64,4 +94,50 @@ object GameState {
     }
     apply(players, config)
   }
+
+  def fromMemento(memento: GameStateMemento): GameState = {
+    val players = memento.players.map(memPlayer =>
+
+      val color = PlayerColor.fromString(memPlayer.color)
+      val pieces = memPlayer.pieces.map(memPiece =>
+        Piece(
+          id = memPiece.id,
+          color = PlayerColor.fromString(memPiece.color),
+          position = memPiece.position
+        )
+      )
+
+      Player(name = memPlayer.name, color = color, pieces = pieces, startOffset = memPlayer.startOffset)
+    )
+
+    val config = BoardConfig(
+      fieldSize = memento.fieldSize,
+      winStrategy = WinStrategy.fromString(memento.winStrategy),
+      numPlayers = memento.numPlayers)
+
+    val phase = GamePhase.fromName(memento.phase)
+
+    val message =
+      if (phase == RollingPhase && memento.rollAttempt > 0) {
+        Some(InvalidRollRetryEvent(0, 3 - memento.rollAttempt))
+      } else{
+        None
+      }
+    val winner = memento.winnerColor.flatMap( memColor =>
+      val color = PlayerColor.fromString(memColor)
+      players.find(_.color == color)
+    )
+    GameState(
+      players = players,
+      config = config,
+      currentPlayerIndex = memento.currentPlayerIndex,
+      lastError = Success(()),
+      message = message,
+      winner = winner,
+      diceRoll = memento.diceRoll,
+      rollAttempt = memento.rollAttempt,
+      phase = GamePhase.fromName(memento.phase)
+    )
+  }
+
 }

@@ -34,7 +34,7 @@ case class Tui()(using controller: ControllerInterface) extends Observer:
       winnerMessage(state)
     )
 
-    val prompt = "TUI-Eingabe ('w'=Wuerfeln, '1-4'=Ziehen, 'u'=Undo, 'r'=Redo, 'q'=Quit): "
+    val prompt = "TUI-Eingabe ('w'=Wuerfeln, '1-4'=Ziehen, 'u'=Undo, 'r'=Redo, 's'=Save, 'l'=Load, 'q'=Quit): "
 
     board.filter(_.nonEmpty).mkString("\n") + "\n" + prompt + "\n"
   }

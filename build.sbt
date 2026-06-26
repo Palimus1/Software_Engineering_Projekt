@@ -27,7 +27,8 @@
         "-deprecation",
         "-Wconf:msg=Implicit parameters should be provided with a `using` clause:s"
       ),
-
+      libraryDependencies += "com.typesafe.play" %% "play-json" % "2.10.8",
+      libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.4.0",
       libraryDependencies += "org.scalafx" %% "scalafx" % "20.0.0-R31",
       libraryDependencies ++= Seq("base", "controls", "fxml", "graphics", "media", "swing", "web").map(m =>
         "org.openjfx" % s"javafx-$m" % "20.0.2" classifier osName

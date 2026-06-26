@@ -6,6 +6,7 @@ import scala.util.{Try, Success, Failure}
 trait GamePhase {
   def handleRoll(state: GameState, roll: Int): Try[GameState]
   def handleMove(state: GameState, pieceId: Int): Try[GameState]
+  def name: String
 
   private def maxPosition(state: GameState): Int = state.config.fieldSize + 4
 
@@ -25,6 +26,15 @@ trait GamePhase {
       val isBlocked = player.pieces.exists(other => other.id != p.id && other.position > 0 && other.position == relPos)
       relPos != p.position && !isInvalidBaseMove && !isBlocked
     }
+  }
+}
+
+object GamePhase {
+  def fromName(name: String): GamePhase = name match {
+    case "rolling"  => RollingPhase
+    case "moving"   => MovingPhase
+    case "gameover" => GameOverPhase
+    case other      => throw new IllegalArgumentException(s"Unknown game phase: $other")
   }
 }
 
@@ -70,6 +80,8 @@ object RollingPhase extends GamePhase {
       }
     }
   }
+
+  override def name: String = "rolling"
 }
 
 object MovingPhase extends GamePhase {
@@ -125,9 +137,12 @@ object MovingPhase extends GamePhase {
         }
     }
   }
+
+  override def name: String = "moving"
 }
 
 object GameOverPhase extends GamePhase {
   override def handleRoll(state: GameState, roll: Int): Try[GameState] = Failure(GameOverException())
   override def handleMove(state: GameState, pieceId: Int): Try[GameState] = Failure(GameOverException())
+  override def name = "gameover"
 }

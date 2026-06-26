@@ -1,9 +1,9 @@
-import ludo.model.*
-import ludo.controller.ControllerInterface
-import ludo.aview.Tui
-import ludo.aview.Gui
-import ludo.controller.impl.Controller
 import ludo.LudoModule
+import ludo.aview.{Gui, Tui}
+import ludo.controller.ControllerInterface
+import ludo.controller.impl.Controller
+import ludo.model.*
+
 import scala.annotation.tailrec
 import scala.io.StdIn
 
@@ -95,9 +95,15 @@ def gameLoop()(using controller: ControllerInterface): Unit = {
       controller.undo()
     case "r" =>
       controller.redo()
+    case "s" =>
+      controller.save()
+      println("Spiel gespeichert.")
+    case "l" =>
+      controller.load()
+      println("Spiel geladen.")
     case "" =>
     case _ =>
-      println("Ungueltige Eingabe! Bitte 'w', '1'-'4', 'u', 'r' oder 'q' eingeben.")
+      println("Ungueltige Eingabe! Bitte 'w', '1'-'4', 'u', 'r', 's', 'l' oder 'q' eingeben.")
   }
 
   gameLoop()

@@ -10,4 +10,6 @@ trait ControllerInterface extends Observable {
   def doMove(pieceId: Int): Unit
   def undo(): Unit
   def redo(): Unit
+  def save(): Unit
+  def load(): Unit
 }

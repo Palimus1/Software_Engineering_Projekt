@@ -69,7 +69,7 @@ class BoardLayoutCalculator(val totalFields: Int) {
     val side = if (shiftedEntry < s0) 0 else if (shiftedEntry < s0 + s1) 1 else if (shiftedEntry < s0 + s1 + s2) 2 else 3
 
     val (bx, by) = calculateAlignedBaseCoordinates(startOffset, 0)
-    
+
     if (inward) {
       side match {
         case 0 | 1 => (bx, by + 2)

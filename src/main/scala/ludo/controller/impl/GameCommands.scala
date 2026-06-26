@@ -5,7 +5,7 @@ import ludo.util.Command
 
 import scala.util.{Failure, Success, Try}
 
-// Kommando für das Würfeln
+
 class RollCommand(roll: Int, controller: Controller) extends Command {
 
   private val oldState: GameState = controller.gameState

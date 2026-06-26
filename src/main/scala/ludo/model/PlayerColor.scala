@@ -7,3 +7,7 @@ enum PlayerColor(val ansiCode: String):
   case Red extends PlayerColor(AnsiColor.RED)
   case Green extends PlayerColor(AnsiColor.GREEN)
   case Yellow extends PlayerColor(AnsiColor.YELLOW)
+
+object PlayerColor {
+  def fromString(value: String): PlayerColor = PlayerColor.valueOf(value)
+}
