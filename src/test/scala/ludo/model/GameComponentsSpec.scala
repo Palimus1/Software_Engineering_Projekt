@@ -1,5 +1,5 @@
 import _root_.ludo.model.*
-import _root_.ludo.model.memento.*
+import _root_.ludo.model.memento.{GameStateMemento, PlayerMemento, PieceMemento}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import scala.util.{Failure, Success}

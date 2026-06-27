@@ -1,7 +1,7 @@
 import _root_.ludo.LudoModule
 import _root_.ludo.controller.ControllerInterface
 import _root_.ludo.fileio.FileIOInterface
-import _root_.ludo.fileio.impl.XmlFileIO
+import _root_.ludo.fileio.impl.JsonFileIO
 import _root_.ludo.model.{BoardConfig, GameState}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -20,7 +20,7 @@ class LudoModuleSpec extends AnyWordSpec with Matchers {
 
       injectedController should not be null
       injectedController.gameState shouldBe state
-      injectedFileIO shouldBe a[XmlFileIO]
+      injectedFileIO shouldBe a[JsonFileIO]
     }
   }
 }

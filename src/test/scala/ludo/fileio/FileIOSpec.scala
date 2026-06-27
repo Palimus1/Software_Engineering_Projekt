@@ -1,7 +1,7 @@
 import _root_.ludo.fileio.FileIOInterface
 import _root_.ludo.fileio.impl.{JsonFileIO, XmlFileIO}
 import _root_.ludo.model.*
-import _root_.ludo.model.memento.*
+import _root_.ludo.model.memento.{GameStateMemento, PlayerMemento, PieceMemento}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

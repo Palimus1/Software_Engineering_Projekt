@@ -22,6 +22,8 @@ class ControllerSpec extends AnyWordSpec with Matchers {
   private val config = BoardConfig(40, 2)
   private val initialState = GameState.create(List("Alice", "Bob"), config)
 
+  private given defaultFileIO: FileIOInterface = new MemoryFileIO(initialState.createMemento())
+
   "A Controller" when {
 
     "performing a move" should {
@@ -345,7 +347,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
     "using FileIO" should {
       "save the current state as a memento" in {
         val fileIO = new MemoryFileIO(initialState.createMemento())
-        val controller = new Controller(initialState, fileIO)
+        val controller = new Controller(initialState)(using fileIO)
 
         controller.save()
 
@@ -355,7 +357,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       "load a state from a memento and clear the undo history" in {
         val loadedState = initialState.copy(currentPlayerIndex = 1, rollAttempt = 2)
         val fileIO = new MemoryFileIO(loadedState.createMemento())
-        val controller = new Controller(initialState, fileIO)
+        val controller = new Controller(initialState)(using fileIO)
 
         controller.rollDice(6)
         controller.load()

@@ -1,7 +1,9 @@
 import _root_.ludo.aview.Tui
 import _root_.ludo.controller.ControllerInterface
 import _root_.ludo.controller.impl.Controller
+import _root_.ludo.fileio.FileIOInterface
 import _root_.ludo.model.*
+import _root_.ludo.model.memento.GameStateMemento
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import scala.io.AnsiColor
@@ -9,10 +11,16 @@ import scala.util.{Failure, Success}
 
 class TuiSpec extends AnyWordSpec with Matchers {
 
+  private class MemoryFileIO(var loadedMemento: GameStateMemento) extends FileIOInterface {
+    override def save(memento: GameStateMemento): Unit = loadedMemento = memento
+    override def load(): GameStateMemento = loadedMemento
+  }
+
   private val config = BoardConfig(40, 2)
   private val state = GameState.create(List("Alice", "Bob"), config)
 
   private def render(testState: GameState): String = {
+    given FileIOInterface = new MemoryFileIO(testState.createMemento())
     val controller: ControllerInterface = new Controller(testState)
     Tui()(using controller).processInput()
   }
@@ -59,6 +67,7 @@ class TuiSpec extends AnyWordSpec with Matchers {
     "call update and print to console when the controller state changes" in {
       val stream = new java.io.ByteArrayOutputStream()
       val testState = state.copy(diceRoll = Some(6), phase = MovingPhase)
+      given FileIOInterface = new MemoryFileIO(testState.createMemento())
       val controller: ControllerInterface = new Controller(testState)
       val tui = Tui()(using controller)
 
