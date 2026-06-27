@@ -26,6 +26,15 @@ class GameComponentsSpec extends AnyWordSpec with Matchers {
       }
     }
 
+    "created via createSetup()" should {
+      "start in SetupPhase(NumPlayers) with a dummy player" in {
+        val state = GameState.createSetup()
+        state.phase shouldBe a[SetupPhase]
+        state.phase.asInstanceOf[SetupPhase].step shouldBe SetupStep.NumPlayers
+        state.players.head.name shouldBe "Setup"
+      }
+    }
+
     "created via the factory method create()" should {
       "use default names for empty or whitespace strings" in {
         val config = BoardConfig(40, 3)

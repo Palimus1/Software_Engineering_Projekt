@@ -14,6 +14,8 @@ case class MustRollFirstException() extends LudoException
 case class GameOverException() extends LudoException
 case class BaseClearException() extends LudoException
 case class BaseLeaveException() extends LudoException
+case class SetupInProgressException() extends LudoException
+case class NotSetupPhaseException() extends LudoException
 
 sealed trait GameEvent
 case class AllPiecesBlockedEvent(roll: Int) extends GameEvent
@@ -72,6 +74,11 @@ object GameState {
 
   def apply(players: List[Player], config: BoardConfig): GameState = {
     new GameState(players, config)
+  }
+
+  def createSetup(): GameState = {
+    val dummyPlayer = Player("Setup", PlayerColor.Blue, Nil, 0)
+    apply(List(dummyPlayer), BoardConfig(40, 4)).copy(phase = SetupPhase(SetupStep.NumPlayers))
   }
 
   def create(playerNames: List[String], config: BoardConfig): GameState = {

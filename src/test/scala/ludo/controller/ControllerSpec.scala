@@ -254,6 +254,51 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       }
     }
 
+    "handling setup actions" should {
+      "process setup inputs and transition to RollingPhase when finished" in {
+        val setupState = GameState.createSetup()
+        val controller = new Controller(setupState)
+        
+        controller.doSetup("2") // NumPlayers
+        controller.gameState.phase.asInstanceOf[SetupPhase].step shouldBe SetupStep.PlayerNames
+        
+        controller.doSetup("Alice") // Player 1
+        controller.doSetup("Bob") // Player 2
+        controller.gameState.phase.asInstanceOf[SetupPhase].step shouldBe SetupStep.FieldSize
+        
+        controller.doSetup("40") // FieldSize
+        controller.gameState.phase.asInstanceOf[SetupPhase].step shouldBe SetupStep.GameMode
+        
+        controller.doSetup("blitz") // GameMode -> Transitions to RollingPhase!
+        controller.gameState.phase shouldBe RollingPhase
+        controller.gameState.players.size shouldBe 2
+        controller.gameState.config.winStrategy shouldBe QuickWinStrategy
+      }
+      
+      "support undo and redo during setup" in {
+        val setupState = GameState.createSetup()
+        val controller = new Controller(setupState)
+        
+        controller.doSetup("2")
+        val stateAfterNumPlayers = controller.gameState
+        
+        controller.doSetup("Alice")
+        controller.gameState.phase.asInstanceOf[SetupPhase].data.names shouldBe List("Alice")
+        
+        controller.undo()
+        controller.gameState shouldBe stateAfterNumPlayers
+        
+        controller.redo()
+        controller.gameState.phase.asInstanceOf[SetupPhase].data.names shouldBe List("Alice")
+      }
+      
+      "return an error if doSetup is called outside of SetupPhase" in {
+        val controller = new Controller(initialState)
+        controller.doSetup("test")
+        controller.gameState.lastError.failed.get shouldBe a[NotSetupPhaseException]
+      }
+    }
+
     "using undo and redo" should {
       "safely handle undo and redo when the history is empty" in {
         val controller: ControllerInterface = new Controller(initialState)

@@ -53,7 +53,7 @@ class TuiSpec extends AnyWordSpec with Matchers {
     "render the current dice roll" in {
       val output = render(state.copy(diceRoll = Some(6)))
 
-      output should include("Du hast eine 6 gewuerfelt!")
+      output should include("You rolled a 6!")
     }
 
     "call update and print to console when the controller state changes" in {
@@ -72,16 +72,16 @@ class TuiSpec extends AnyWordSpec with Matchers {
 
     "translate all LudoExceptions into user-friendly colored strings" in {
       val errorCases = List(
-        (NeedSixException(), "Du brauchst eine 6, um die Base zu verlassen!"),
-        (BlockedException(), "Du kannst deine eigenen Figuren nicht schlagen!"),
-        (OvershootException(), "Der Zug ueberschreitet das Ziel!"),
-        (InvalidPieceException(), "Die Figuren sind mit 1-4 indiziert! Bitte erneut waehlen."),
-        (AlreadyRolledException(), "Du hast schon gewuerfelt! Bitte bewege eine Figur."),
-        (MustRollFirstException(), "Du musst erst wuerfeln!"),
-        (GameOverException(), "Das Spiel ist bereits vorbei!"),
-        (BaseClearException(), "Du musst das Startfeld freiraeumen!"),
-        (BaseLeaveException(), "Du musst eine Figur aus der Base bewegen!"),
-        (new RuntimeException("Test Crash"), "Ein Fehler ist aufgetreten: Test Crash")
+        (NeedSixException(), "You need a 6 to leave the base!"),
+        (BlockedException(), "You cannot capture your own pieces!"),
+        (OvershootException(), "The move overshoots the target!"),
+        (InvalidPieceException(), "Pieces are indexed 1-4! Please choose again."),
+        (AlreadyRolledException(), "You have already rolled! Please move a piece."),
+        (MustRollFirstException(), "You must roll first!"),
+        (GameOverException(), "The game is already over!"),
+        (BaseClearException(), "You must clear the start field!"),
+        (BaseLeaveException(), "You must move a piece out of the base!"),
+        (new RuntimeException("Test Crash"), "An error occurred: Test Crash")
       )
 
       for ((exception, expectedText) <- errorCases) {
@@ -92,15 +92,15 @@ class TuiSpec extends AnyWordSpec with Matchers {
       }
 
       val cleanOutput = render(state.copy(lastError = Success(())))
-      cleanOutput should not include "Du brauchst eine 6"
-      cleanOutput should not include "Ein Fehler ist aufgetreten"
+      cleanOutput should not include "You need a 6"
+      cleanOutput should not include "An error occurred"
     }
 
     "translate GameEvents into info messages" in {
       val events = List(
-        (AllPiecesBlockedEvent(4), "Eine 4 gewuerfelt, aber alle Figuren sind blockiert! Naechster Spieler."),
-        (InvalidRollRetryEvent(2, 1), "Eine 2 gewuerfelt! Kein gueltiger Zug. Du hast noch 1 Versuch(e) uebrig."),
-        (ThreeStrikesEvent(5), "Eine 5 gewuerfelt. Dreimal keinen Zug gehabt. Naechster Spieler ist dran.")
+        (AllPiecesBlockedEvent(4), "Rolled a 4, but all pieces are blocked! Next player."),
+        (InvalidRollRetryEvent(2, 1), "Rolled a 2! Not a valid move. You have 1 attempt(s) left."),
+        (ThreeStrikesEvent(5), "Rolled a 5. No moves possible three times. Next player's turn.")
       )
 
       for ((event, expectedText) <- events) {
@@ -114,14 +114,14 @@ class TuiSpec extends AnyWordSpec with Matchers {
       val winnerPlayer = state.players.head
       val output = render(state.copy(winner = Some(winnerPlayer)))
 
-      output should include(s"Glueckwunsch! ${winnerPlayer.name}")
-      output should include("hat das Spiel gewonnen!")
+      output should include(s"Congratulations! ${winnerPlayer.name}")
+      output should include("has won the game!")
     }
 
     "print the interactive prompt at the very end of the output" in {
       val output = render(state)
 
-      output should endWith("TUI-Eingabe ('w'=Wuerfeln, '1-4'=Ziehen, 'u'=Undo, 'r'=Redo, 's'=Save, 'l'=Load, 'q'=Quit): \n")
+      output should endWith("TUI-Input ('w'=Roll, '1-4'=Move, 'u'=Undo, 'r'=Redo, 's'=Save, 'l'=Load, 'q'=Quit): \n")
     }
   }
 }

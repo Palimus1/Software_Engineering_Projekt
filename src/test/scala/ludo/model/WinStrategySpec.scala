@@ -79,6 +79,7 @@ class WinStrategySpec extends AnyWordSpec with Matchers {
       GamePhase.fromName("rolling") shouldBe RollingPhase
       GamePhase.fromName("moving") shouldBe MovingPhase
       GamePhase.fromName("gameover") shouldBe GameOverPhase
+      GamePhase.fromName("setup") shouldBe SetupPhase(SetupStep.NumPlayers)
       an[IllegalArgumentException] should be thrownBy GamePhase.fromName("invalid")
     }
   }

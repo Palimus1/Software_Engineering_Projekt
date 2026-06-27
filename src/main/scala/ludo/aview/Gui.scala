@@ -16,12 +16,13 @@ class Gui()(using controller: ControllerInterface) extends Observer {
 
   Platform.startup(() => {
     mainStage = new Stage {
-      title.value = "Mensch ärgere dich nicht - ScalaFX"
+      title.value = "Ludo - ScalaFX"
       width = 900
       height = 800
+      maximized = true
       scene = new Scene {
         fill = Color.web("#f4f4f4")
-        root = GuiLogic.createRootPane(controller.gameState)
+        root = GuiLogic.createRootPane(controller.gameState, controller)
       }
     }
     mainStage.show()
@@ -30,7 +31,7 @@ class Gui()(using controller: ControllerInterface) extends Observer {
   override def update(): Unit = {
     Platform.runLater(() => {
       if (mainStage != null && mainStage.scene.value != null) {
-        mainStage.scene.value.root = GuiLogic.createRootPane(controller.gameState)
+        mainStage.scene.value.root = GuiLogic.createRootPane(controller.gameState, controller)
       }
     })
   }

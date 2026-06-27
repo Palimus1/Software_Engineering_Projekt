@@ -20,29 +20,51 @@ case class Tui()(using controller: ControllerInterface) extends Observer:
   def renderAll(): String = {
     val state = controller.gameState
 
-    val playerStr = s"\nAktueller Spieler: ${state.currentPlayer.name} (${state.currentPlayer.color})"
-    val rollStr = state.diceRoll.map(roll => s"Du hast eine $roll gewuerfelt!").getOrElse("")
+    state.phase match {
+      case SetupPhase(step, data) =>
+        val prompt = step match {
+          case SetupStep.NumPlayers => "Please specify the number of players (1-4):"
+          case SetupStep.PlayerNames => s"Please enter the name for player ${data.names.size + 1}:"
+          case SetupStep.FieldSize => "Please specify the board size (Default 40):"
+          case SetupStep.GameMode => "Select a game mode: Standard mode(ENTER)  ---  Blitz mode(Blitz):"
+        }
+        val configStr = step match {
+          case SetupStep.NumPlayers => "Current configuration: [Nothing configured yet]"
+          case SetupStep.PlayerNames => s"Current configuration: Number of players = ${data.numPlayers}, Names so far = [${data.names.mkString(", ")}]"
+          case SetupStep.FieldSize => s"Current configuration: Number of players = ${data.numPlayers}, Names = [${data.names.mkString(", ")}]"
+          case SetupStep.GameMode => s"Current configuration: Number of players = ${data.numPlayers}, Names = [${data.names.mkString(", ")}], Board size = ${data.fieldSize}"
+        }
+        val errorMsg = state.lastError match {
+          case Failure(e) => s"${AnsiColor.RED}Error: ${e.getMessage}${AnsiColor.RESET}\n"
+          case _ => ""
+        }
+        s"\n=== LUDO SETUP ===\n$configStr\n$errorMsg$prompt\n"
 
-    val board = List(
-      playerStr,
-      rollStr,
-      printHome(state),
-      printField(state),
-      printTarget(state),
-      errorMessage(state),
-      infoMessage(state),
-      winnerMessage(state)
-    )
+      case _ =>
+        val playerStr = s"\nCurrent player: ${state.currentPlayer.name} (${state.currentPlayer.color})"
+        val rollStr = state.diceRoll.map(roll => s"You rolled a $roll!").getOrElse("")
 
-    val prompt = "TUI-Eingabe ('w'=Wuerfeln, '1-4'=Ziehen, 'u'=Undo, 'r'=Redo, 's'=Save, 'l'=Load, 'q'=Quit): "
+        val board = List(
+          playerStr,
+          rollStr,
+          printHome(state),
+          printField(state),
+          printTarget(state),
+          errorMessage(state),
+          infoMessage(state),
+          winnerMessage(state)
+        )
 
-    board.filter(_.nonEmpty).mkString("\n") + "\n" + prompt + "\n"
+        val prompt = "TUI-Input ('w'=Roll, '1-4'=Move, 'u'=Undo, 'r'=Redo, 's'=Save, 'l'=Load, 'q'=Quit): "
+
+        board.filter(_.nonEmpty).mkString("\n") + "\n" + prompt + "\n"
+    }
   }
 
   private def winnerMessage(state: GameState): String = {
     state.winner match {
       case Some(player) =>
-        s"\nGlueckwunsch! ${player.name} (${player.color.ansiCode}${player.color}${AnsiColor.RESET}) hat das Spiel gewonnen!"
+        s"\nCongratulations! ${player.name} (${player.color.ansiCode}${player.color}${AnsiColor.RESET}) has won the game!"
       case None => ""
     }
   }
@@ -50,11 +72,11 @@ case class Tui()(using controller: ControllerInterface) extends Observer:
   private def infoMessage(state: GameState): String = {
     state.message match {
       case Some(AllPiecesBlockedEvent(roll)) =>
-        s"Eine $roll gewuerfelt, aber alle Figuren sind blockiert! Naechster Spieler."
+        s"Rolled a $roll, but all pieces are blocked! Next player."
       case Some(InvalidRollRetryEvent(roll, attemptsLeft)) =>
-        s"Eine $roll gewuerfelt! Kein gueltiger Zug. Du hast noch $attemptsLeft Versuch(e) uebrig."
+        s"Rolled a $roll! Not a valid move. You have $attemptsLeft attempt(s) left."
       case Some(ThreeStrikesEvent(roll)) =>
-        s"Eine $roll gewuerfelt. Dreimal keinen Zug gehabt. Naechster Spieler ist dran."
+        s"Rolled a $roll. No moves possible three times. Next player's turn."
       case None => ""
     }
   }
@@ -62,16 +84,16 @@ case class Tui()(using controller: ControllerInterface) extends Observer:
 
   private def errorMessage(state: GameState): String = {
     state.lastError match {
-      case Failure(_: NeedSixException) => s"${AnsiColor.RED}Du brauchst eine 6, um die Base zu verlassen!${AnsiColor.RESET}"
-      case Failure(_: BlockedException) => s"${AnsiColor.RED}Du kannst deine eigenen Figuren nicht schlagen!${AnsiColor.RESET}"
-      case Failure(_: OvershootException) => s"${AnsiColor.RED}Der Zug ueberschreitet das Ziel!${AnsiColor.RESET}"
-      case Failure(_: InvalidPieceException) => s"${AnsiColor.RED}Die Figuren sind mit 1-4 indiziert! Bitte erneut waehlen.${AnsiColor.RESET}"
-      case Failure(_: AlreadyRolledException) => s"${AnsiColor.RED}Du hast schon gewuerfelt! Bitte bewege eine Figur.${AnsiColor.RESET}"
-      case Failure(_: MustRollFirstException) => s"${AnsiColor.RED}Du musst erst wuerfeln!${AnsiColor.RESET}"
-      case Failure(_: GameOverException) => s"${AnsiColor.RED}Das Spiel ist bereits vorbei!${AnsiColor.RESET}"
-      case Failure(_: BaseClearException) => s"${AnsiColor.RED}Du musst das Startfeld freiraeumen!${AnsiColor.RESET}"
-      case Failure(_: BaseLeaveException) => s"${AnsiColor.RED}Du musst eine Figur aus der Base bewegen!${AnsiColor.RESET}"
-      case Failure(e: Throwable) => s"${AnsiColor.RED}Ein Fehler ist aufgetreten: ${e.getMessage}${AnsiColor.RESET}"
+      case Failure(_: NeedSixException) => s"${AnsiColor.RED}You need a 6 to leave the base!${AnsiColor.RESET}"
+      case Failure(_: BlockedException) => s"${AnsiColor.RED}You cannot capture your own pieces!${AnsiColor.RESET}"
+      case Failure(_: OvershootException) => s"${AnsiColor.RED}The move overshoots the target!${AnsiColor.RESET}"
+      case Failure(_: InvalidPieceException) => s"${AnsiColor.RED}Pieces are indexed 1-4! Please choose again.${AnsiColor.RESET}"
+      case Failure(_: AlreadyRolledException) => s"${AnsiColor.RED}You have already rolled! Please move a piece.${AnsiColor.RESET}"
+      case Failure(_: MustRollFirstException) => s"${AnsiColor.RED}You must roll first!${AnsiColor.RESET}"
+      case Failure(_: GameOverException) => s"${AnsiColor.RED}The game is already over!${AnsiColor.RESET}"
+      case Failure(_: BaseClearException) => s"${AnsiColor.RED}You must clear the start field!${AnsiColor.RESET}"
+      case Failure(_: BaseLeaveException) => s"${AnsiColor.RED}You must move a piece out of the base!${AnsiColor.RESET}"
+      case Failure(e: Throwable) => s"${AnsiColor.RED}An error occurred: ${e.getMessage}${AnsiColor.RESET}"
       case Success(_) => "" // Der leere Success-Fall
     }
   }

@@ -6,6 +6,7 @@ import scala.util.{Try, Success, Failure}
 trait GamePhase {
   def handleRoll(state: GameState, roll: Int): Try[GameState]
   def handleMove(state: GameState, pieceId: Int): Try[GameState]
+  def handleSetup(state: GameState, input: String): Try[GameState] = Failure(NotSetupPhaseException())
   def name: String
 
   private def maxPosition(state: GameState): Int = state.config.fieldSize + 4
@@ -34,8 +35,53 @@ object GamePhase {
     case "rolling"  => RollingPhase
     case "moving"   => MovingPhase
     case "gameover" => GameOverPhase
+    case "setup"    => SetupPhase(SetupStep.NumPlayers)
     case other      => throw new IllegalArgumentException(s"Unknown game phase: $other")
   }
+}
+
+enum SetupStep:
+  case NumPlayers
+  case PlayerNames
+  case FieldSize
+  case GameMode
+
+case class SetupData(names: List[String] = Nil, numPlayers: Int = 4, fieldSize: Int = 40)
+
+case class SetupPhase(step: SetupStep, data: SetupData = SetupData()) extends GamePhase {
+  override def handleRoll(state: GameState, roll: Int): Try[GameState] = Failure(SetupInProgressException())
+  override def handleMove(state: GameState, pieceId: Int): Try[GameState] = Failure(SetupInProgressException())
+  
+  override def handleSetup(state: GameState, input: String): Try[GameState] = {
+    step match {
+      case SetupStep.NumPlayers =>
+        val num = input.toIntOption.getOrElse(4).max(1).min(4)
+        Success(state.copy(phase = SetupPhase(SetupStep.PlayerNames, data.copy(numPlayers = num))))
+        
+      case SetupStep.PlayerNames =>
+        val newNames = data.names :+ (if(input.trim.isEmpty) s"Player ${data.names.size + 1}" else input.trim)
+        if (newNames.size == data.numPlayers) {
+           Success(state.copy(phase = SetupPhase(SetupStep.FieldSize, data.copy(names = newNames))))
+        } else {
+           Success(state.copy(phase = SetupPhase(SetupStep.PlayerNames, data.copy(names = newNames))))
+        }
+        
+      case SetupStep.FieldSize =>
+        val raw = input.toIntOption.getOrElse(40)
+        val fs = if (raw < 4) 4 else if (raw % 2 != 0) raw + 1 else raw
+        Success(state.copy(phase = SetupPhase(SetupStep.GameMode, data.copy(fieldSize = fs))))
+        
+      case SetupStep.GameMode =>
+        val strategy = input.trim.toLowerCase match {
+          case "blitz" => QuickWinStrategy
+          case _ => StandardWinStrategy
+        }
+        val finalConfig = BoardConfig(data.fieldSize, data.numPlayers, strategy)
+        val finalState = GameState.create(data.names, finalConfig)
+        Success(finalState)
+    }
+  }
+  override def name: String = "setup"
 }
 
 object RollingPhase extends GamePhase {

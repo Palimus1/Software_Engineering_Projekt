@@ -12,6 +12,11 @@ class Controller(var gameState: GameState, fileIO: FileIOInterface) extends Cont
 
   private val undoManager = new UndoManager
 
+  override def doSetup(input: String): Unit = {
+    undoManager.doStep(new SetupCommand(input, this))
+    notifyObservers()
+  }
+
   override def rollDice(roll: Int = scala.util.Random.between(1, 7)): Unit = {
     undoManager.doStep(new RollCommand(roll, this))
     notifyObservers()
