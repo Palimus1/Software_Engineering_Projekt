@@ -31,6 +31,9 @@ metals.sbt
 .idea_modules
 /.worksheet/
 
+# fileIO saves
 
+game.json
+game.xml
 
 .scannerwork/report-task.txt

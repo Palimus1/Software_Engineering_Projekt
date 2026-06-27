@@ -2,13 +2,10 @@ package ludo.controller.impl
 
 import ludo.controller.ControllerInterface
 import ludo.fileio.FileIOInterface
-import ludo.fileio.impl.JsonFileIO
 import ludo.model.*
-import ludo.util.{Observable, UndoManager}
+import ludo.util.UndoManager
 
-class Controller(var gameState: GameState, fileIO: FileIOInterface) extends ControllerInterface:
-
-  def this(gameState: GameState) = this(gameState, new JsonFileIO)
+class Controller(var gameState: GameState)(using fileIO: FileIOInterface) extends ControllerInterface:
 
   private val undoManager = new UndoManager
 
