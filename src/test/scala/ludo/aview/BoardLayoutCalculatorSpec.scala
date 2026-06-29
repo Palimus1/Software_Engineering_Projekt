@@ -59,6 +59,15 @@ class BoardLayoutCalculatorSpec extends AnyWordSpec with Matchers {
       calc.calculateAlignedBaseCoordinates(10, 3) shouldBe (2, 4)
     }
 
+    "calculate aligned base coordinates for inward edge cases" in {
+      val calc = new BoardLayoutCalculator(40)
+
+      calc.calculateAlignedBaseCoordinates(23, 0) shouldBe (6, 1)
+      calc.calculateAlignedBaseCoordinates(33, 0) shouldBe (8, 6)
+      calc.calculateAlignedBaseCoordinates(3, 0) shouldBe (3, 8)
+      calc.calculateAlignedBaseCoordinates(13, 0) shouldBe (1, 3)
+    }
+
     "calculate name coordinates inwards for all sides" in {
       val calc = new BoardLayoutCalculator(40)
 
@@ -66,6 +75,13 @@ class BoardLayoutCalculatorSpec extends AnyWordSpec with Matchers {
       calc.calculateNameCoordinates(30) shouldBe (8, 8)
       calc.calculateNameCoordinates(0) shouldBe (3, 7)
       calc.calculateNameCoordinates(10) shouldBe (1, 2)
+    }
+
+    "calculate name coordinates for inward vertical edge cases" in {
+      val calc = new BoardLayoutCalculator(40)
+
+      calc.calculateNameCoordinates(25) shouldBe (8, 3)
+      calc.calculateNameCoordinates(13) shouldBe (1, 5)
     }
 
     "calculate aligned target coordinates outwards for all sides" in {

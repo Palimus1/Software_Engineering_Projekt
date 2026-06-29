@@ -127,6 +127,39 @@ class TuiSpec extends AnyWordSpec with Matchers {
       output should include("has won the game!")
     }
 
+
+    "render every setup step with configuration, prompts and setup errors" in {
+      val setupStart = GameState.createSetup()
+      val startOutput = render(setupStart)
+      startOutput should include("=== LUDO SETUP ===")
+      startOutput should include("Current configuration: [Nothing configured yet]")
+      startOutput should include("Please specify the number of players (1-4):")
+
+      val playerNamesState = setupStart.phase.handleSetup(setupStart, "2").get
+      val playerNamesOutput = render(playerNamesState)
+      playerNamesOutput should include("Current configuration: Number of players = 2, Names so far = []")
+      playerNamesOutput should include("Please enter the name for player 1:")
+
+      val secondPlayerNameState = playerNamesState.phase.handleSetup(playerNamesState, "Alice").get
+      val secondPlayerNameOutput = render(secondPlayerNameState)
+      secondPlayerNameOutput should include("Current configuration: Number of players = 2, Names so far = [Alice]")
+      secondPlayerNameOutput should include("Please enter the name for player 2:")
+
+      val fieldSizeState = secondPlayerNameState.phase.handleSetup(secondPlayerNameState, "Bob").get
+      val fieldSizeOutput = render(fieldSizeState)
+      fieldSizeOutput should include("Current configuration: Number of players = 2, Names = [Alice, Bob]")
+      fieldSizeOutput should include("Please specify the board size (Default 40):")
+
+      val gameModeState = fieldSizeState.phase.handleSetup(fieldSizeState, "40").get
+      val gameModeOutput = render(gameModeState)
+      gameModeOutput should include("Current configuration: Number of players = 2, Names = [Alice, Bob], Board size = 40")
+      gameModeOutput should include("Select a game mode: Standard mode(ENTER)  ---  Blitz mode(Blitz):")
+
+      val errorOutput = render(setupStart.copy(lastError = Failure(new RuntimeException("Invalid setup input"))))
+      errorOutput should include("Error: Invalid setup input")
+      errorOutput should include(AnsiColor.RED)
+    }
+
     "print the interactive prompt at the very end of the output" in {
       val output = render(state)
 

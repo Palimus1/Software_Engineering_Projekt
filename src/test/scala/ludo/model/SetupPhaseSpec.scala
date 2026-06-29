@@ -10,12 +10,12 @@ class SetupPhaseSpec extends AnyWordSpec with Matchers {
       val state = GameState.createSetup()
       
       "return SetupInProgressException for handleRoll" in {
-        state.phase.handleRoll(state, 6) shouldBe a[Failure[_]]
+        state.phase.handleRoll(state, 6).isFailure shouldBe true
         state.phase.handleRoll(state, 6).failed.get shouldBe a[SetupInProgressException]
       }
       
       "return SetupInProgressException for handleMove" in {
-        state.phase.handleMove(state, 1) shouldBe a[Failure[_]]
+        state.phase.handleMove(state, 1).isFailure shouldBe true
         state.phase.handleMove(state, 1).failed.get shouldBe a[SetupInProgressException]
       }
     }
