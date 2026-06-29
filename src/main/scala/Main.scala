@@ -1,7 +1,6 @@
 import ludo.LudoModule
 import ludo.aview.{Gui, Tui}
 import ludo.controller.ControllerInterface
-import ludo.controller.impl.Controller
 import ludo.model.*
 
 import scala.annotation.tailrec
@@ -15,8 +14,12 @@ import scala.io.StdIn
 
   import module.given
 
+  val uiMode = sys.env.getOrElse("LUDO_UI", "both").toLowerCase.trim
+
   val tui = Tui()
-  val gui = new Gui()
+  if (uiMode != "tui") {
+    new Gui()
+  }
 
   tui.update()
   gameLoop()
@@ -40,7 +43,7 @@ def gameLoop()(using controller: ControllerInterface): Unit = {
         sys.exit(0)
       }
       controller.doSetup(input)
-      
+
     case _ =>
       input.toLowerCase match {
         case "q" =>

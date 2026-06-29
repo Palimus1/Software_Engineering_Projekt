@@ -1,0 +1,8 @@
+services:
+  ludo:
+    build: .
+    image: ludo:v1
+    environment:
+      LUDO_UI: tui
+    stdin_open: true
+    tty: true

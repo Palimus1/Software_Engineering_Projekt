@@ -1,0 +1,25 @@
+.git
+.gitignore
+.idea
+.bsp
+.vscode
+.scannerwork
+
+# Build-Artefakte werden im Container neu erzeugt
+target
+project/target
+project/project/target
+
+# Lokale/temporäre Dateien
+*.class
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Spielstände sollen nicht versehentlich ins Image kopiert werden
+game.json
+game.xml
+
+# Docker/Compose Laufzeitdaten
+docker-data
