@@ -24,25 +24,25 @@ object GuiLogic {
       case _ => createGamePane(state, controller)
     }
 
-    val undoBtn = new Button("⏪  UNDO") {
+    val undoBtn = new Button("UNDO") {
       style = "-fx-font-size: 14px; -fx-background-color: #6b6b6bff; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16;"
       cursor = Cursor.Hand
       onAction = _ => controller.undo()
     }
     
-    val redoBtn = new Button("⏩  REDO") {
+    val redoBtn = new Button("REDO") {
       style = "-fx-font-size: 14px; -fx-background-color: #6b6b6bff; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16;"
       cursor = Cursor.Hand
       onAction = _ => controller.redo()
     }
 
-    val saveBtn = new Button("💾  SAVE") {
+    val saveBtn = new Button("SAVE") {
       style = "-fx-font-size: 14px; -fx-background-color: #6b6b6bff; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16;"
       cursor = Cursor.Hand
       onAction = _ => controller.save()
     }
 
-    val loadBtn = new Button("📂  LOAD") {
+    val loadBtn = new Button("LOAD") {
       style = "-fx-font-size: 14px; -fx-background-color: #6b6b6bff; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16;"
       cursor = Cursor.Hand
       onAction = _ => controller.load()
@@ -179,7 +179,7 @@ object GuiLogic {
 
   private def createSetupPane(step: SetupStep, data: SetupData, controller: ControllerInterface): Pane = {
     val titleText = new Text {
-      text = "⚙ Ludo Setup"
+      text = "Ludo Setup"
       style = "-fx-font-family: 'Segoe UI', sans-serif; -fx-font-weight: bold; -fx-font-size: 46px;"
       fill = Color.web("#2c3e50")
     }
@@ -249,8 +249,8 @@ object GuiLogic {
         val label = new Text("Choose game mode:") { 
           style = "-fx-font-size: 22px; -fx-font-weight: bold; -fx-fill: #34495e;" 
         }
-        val stdBtn = createStyledButton("🐢 Standard", "#9b59b6", "#8e44ad", () => controller.doSetup("standard"), "20 40")
-        val blitzBtn = createStyledButton("⚡ Blitz", "#e67e22", "#d35400", () => controller.doSetup("blitz"), "20 40")
+        val stdBtn = createStyledButton("Standard", "#9b59b6", "#8e44ad", () => controller.doSetup("standard"), "20 40")
+        val blitzBtn = createStyledButton("Blitz", "#e67e22", "#d35400", () => controller.doSetup("blitz"), "20 40")
         val btnBox = new HBox {
           spacing = 30
           alignment = Pos.Center
