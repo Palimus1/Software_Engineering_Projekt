@@ -5,6 +5,26 @@
 
 Ein Scala 3 Projekt.
 
+## Direkte Ausführung
+
+compile:
+sbt compile
+
+run:
+sbt run
+
+    WARNUNG: Unsupported JavaFX configuration: classes were loaded from 'unnamed module @49993335'
+sbt lädt JavaFX-Bibliotheken über klassischen Classpath statt über neueres Java-Modulsystem
+-> Meldung ist fest in JavaFX, kann in Terminal nicht unterdrück werden
+-> absolut keine negative Auswirkungen auf die Ausführung oder Funktionalität des Spiels
+
+tests:
+sbt clean coverage test coverageReport
+dann: /target/scala-3.8.2/scoverage-report/ludo/index.html öffnen
+
+
+
+
 ## Ausführen mit Docker
 
 Standardmäßig startet der Container die TUI
@@ -23,16 +43,17 @@ Die GUI kann optional ebenfalls aus Docker gestartet werden. Dafür muss auf dem
 
 Prüfen, ob Docker läuft:
 
+Unter Windows und macOS muss Docker Desktop geöffnet sein.
+
 ```bash
 docker version
 ```
 
-Unter Windows und macOS muss Docker Desktop geöffnet sein.
+
 
 ### Windows
 
 - Docker Desktop installieren und starten.
-- In Docker Desktop müssen Linux-Container verwendet werden.
 - Für die GUI zusätzlich Xming oder XLaunch installieren.
 
 ### macOS
@@ -54,7 +75,7 @@ Im Projektordner ausführen:
 ```bash
 docker build -t ludo:v1 .
 ```
-
+Das kann ein paar Minuten dauern.
 Das Image heißt danach lokal `ludo:v1`.
 
 ---
@@ -97,15 +118,8 @@ Disable access control
 
 Damit XLaunch starten. Falls die Windows-Firewall fragt, den Zugriff erlauben.
 
-### 2. Image neu bauen
 
-Falls das Image nach Änderungen noch nicht neu gebaut wurde:
-
-```powershell
-docker build -t ludo:v1 .
-```
-
-### 3. Container mit GUI starten
+### 2. Container mit GUI starten
 
 In PowerShell im Projektordner ausführen:
 
