@@ -261,17 +261,17 @@ class ControllerSpec extends AnyWordSpec with Matchers {
         val setupState = GameState.createSetup()
         val controller = new Controller(setupState)
         
-        controller.doSetup("2") // NumPlayers
+        controller.doSetup("2")
         controller.gameState.phase.asInstanceOf[SetupPhase].step shouldBe SetupStep.PlayerNames
         
-        controller.doSetup("Alice") // Player 1
-        controller.doSetup("Bob") // Player 2
+        controller.doSetup("Alice")
+        controller.doSetup("Bob") 
         controller.gameState.phase.asInstanceOf[SetupPhase].step shouldBe SetupStep.FieldSize
         
-        controller.doSetup("40") // FieldSize
+        controller.doSetup("40")
         controller.gameState.phase.asInstanceOf[SetupPhase].step shouldBe SetupStep.GameMode
         
-        controller.doSetup("blitz") // GameMode -> Transitions to RollingPhase!
+        controller.doSetup("blitz")
         controller.gameState.phase shouldBe RollingPhase
         controller.gameState.players.size shouldBe 2
         controller.gameState.config.winStrategy shouldBe QuickWinStrategy

@@ -118,15 +118,15 @@ object GuiLogic {
         case Failure(_: GameOverException) => "The game is already over!"
         case Failure(_: BaseClearException) => "You must clear the start field!"
         case Failure(_: BaseLeaveException) => "You must move a piece out of the base!"
-        case Failure(e) => if (e.getMessage != null) e.getMessage else e.getClass.getSimpleName
+        case Failure(e) => Option(e.getMessage).getOrElse(e.getClass.getSimpleName)
         case Success(_) => ""
       }
       
-      val displayMsg = if (errorMsg == null) "" else errorMsg
+      val displayMsg = Option(errorMsg).getOrElse("")
       visible = displayMsg.nonEmpty
       managed = displayMsg.nonEmpty
       children = new Text {
-        text = "⚠ " + displayMsg
+        text = displayMsg
         style = "-fx-fill: #c62828; -fx-font-weight: bold; -fx-font-size: 14px;"
       }
     }

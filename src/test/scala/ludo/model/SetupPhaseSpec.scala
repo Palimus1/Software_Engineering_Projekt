@@ -41,31 +41,26 @@ class SetupPhaseSpec extends AnyWordSpec with Matchers {
     
     "processing setup steps" should {
       "progress through NumPlayers -> PlayerNames -> FieldSize -> GameMode" in {
-        var state = GameState.createSetup() // Starts at NumPlayers
+        var state = GameState.createSetup() 
         state.phase.name shouldBe "setup"
         
-        // 1. NumPlayers: input "2"
         val s1 = state.phase.handleSetup(state, "2").get
         s1.phase shouldBe a[SetupPhase]
         s1.phase.asInstanceOf[SetupPhase].step shouldBe SetupStep.PlayerNames
         s1.phase.asInstanceOf[SetupPhase].data.numPlayers shouldBe 2
         
-        // 2. PlayerNames (Player 1)
         val s2 = s1.phase.handleSetup(s1, "Alice").get
         s2.phase.asInstanceOf[SetupPhase].step shouldBe SetupStep.PlayerNames
         s2.phase.asInstanceOf[SetupPhase].data.names shouldBe List("Alice")
         
-        // 3. PlayerNames (Player 2)
-        val s3 = s2.phase.handleSetup(s2, "   ").get // Test empty name fallback
+        val s3 = s2.phase.handleSetup(s2, "   ").get 
         s3.phase.asInstanceOf[SetupPhase].step shouldBe SetupStep.FieldSize
         s3.phase.asInstanceOf[SetupPhase].data.names shouldBe List("Alice", "Player 2")
         
-        // 4. FieldSize: input "10"
         val s4 = s3.phase.handleSetup(s3, "10").get
         s4.phase.asInstanceOf[SetupPhase].step shouldBe SetupStep.GameMode
         s4.phase.asInstanceOf[SetupPhase].data.fieldSize shouldBe 10
         
-        // 5. GameMode: input "blitz" -> Completes setup!
         val s5 = s4.phase.handleSetup(s4, "blitz").get
         s5.phase shouldBe RollingPhase
         s5.config.fieldSize shouldBe 10
@@ -77,25 +72,20 @@ class SetupPhaseSpec extends AnyWordSpec with Matchers {
       "handle edge cases in inputs" in {
         var state = GameState.createSetup()
         
-        // NumPlayers out of bounds (< 1)
         val s1 = state.phase.handleSetup(state, "0").get
         s1.phase.asInstanceOf[SetupPhase].data.numPlayers shouldBe 1
         
         var st2 = GameState.createSetup()
-        // NumPlayers out of bounds (> 4)
         val s1_2 = st2.phase.handleSetup(st2, "5").get
         s1_2.phase.asInstanceOf[SetupPhase].data.numPlayers shouldBe 4
         
-        // FieldSize invalid (too small)
-        var sfs = s1.phase.handleSetup(s1, "Alice").get // Name
-        val sfs2 = sfs.phase.handleSetup(sfs, "3").get // Size 3 -> rounded to 4
+        var sfs = s1.phase.handleSetup(s1, "Alice").get 
+        val sfs2 = sfs.phase.handleSetup(sfs, "3").get
         sfs2.phase.asInstanceOf[SetupPhase].data.fieldSize shouldBe 4
         
-        // FieldSize odd number
-        val sfs3 = sfs.phase.handleSetup(sfs, "15").get // Size 15 -> rounded to 16
+        val sfs3 = sfs.phase.handleSetup(sfs, "15").get
         sfs3.phase.asInstanceOf[SetupPhase].data.fieldSize shouldBe 16
         
-        // GameMode default
         val sFinal = sfs3.phase.handleSetup(sfs3, "anything").get
         sFinal.config.winStrategy shouldBe StandardWinStrategy
       }

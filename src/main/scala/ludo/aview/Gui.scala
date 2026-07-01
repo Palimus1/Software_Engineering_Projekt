@@ -12,10 +12,10 @@ class Gui()(using controller: ControllerInterface) extends Observer {
 
   controller.add(this)
 
-  private var mainStage: Stage = null
+  private var mainStage: Option[Stage] = None
 
   Platform.startup(() => {
-    mainStage = new Stage {
+    val stage = new Stage {
       title.value = "Ludo - ScalaFX"
       width = 900
       height = 800
@@ -25,13 +25,16 @@ class Gui()(using controller: ControllerInterface) extends Observer {
         root = GuiLogic.createRootPane(controller.gameState, controller)
       }
     }
-    mainStage.show()
+    mainStage = Some(stage)
+    stage.show()
   })
 
   override def update(): Unit = {
     Platform.runLater(() => {
-      if (mainStage != null && mainStage.scene.value != null) {
-        mainStage.scene.value.root = GuiLogic.createRootPane(controller.gameState, controller)
+      mainStage.foreach { stage =>
+        Option(stage.scene.value).foreach { scene =>
+          scene.root = GuiLogic.createRootPane(controller.gameState, controller)
+        }
       }
     })
   }

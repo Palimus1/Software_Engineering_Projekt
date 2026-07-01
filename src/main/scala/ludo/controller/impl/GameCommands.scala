@@ -30,7 +30,6 @@ class RollCommand(roll: Int, controller: Controller) extends Command {
   }
 }
 
-// Kommando für das Bewegen einer Figur
 class MoveCommand(pieceId: Int, controller: Controller) extends Command {
   private val oldState: GameState = controller.gameState
   private var newState: GameState = controller.gameState

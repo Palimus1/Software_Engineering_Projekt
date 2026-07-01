@@ -2,7 +2,7 @@ package ludo.model
 
 import ludo.model.memento.*
 
-import scala.util.{Failure, Success, Try} // <--- WICHTIG: Neuer Import!
+import scala.util.{Failure, Success, Try}
 
 sealed trait LudoException extends Exception
 case class NeedSixException() extends LudoException
@@ -63,7 +63,7 @@ case class GameState(players: List[Player], config: BoardConfig, currentPlayerIn
       numPlayers = this.config.numPlayers,
       winStrategy = this.config.winStrategy.name,
       currentPlayerIndex = this.currentPlayerIndex,
-      winnerColor = this.winner.map(_.color.toString), //gibt bei None wieder None?
+      winnerColor = this.winner.map(_.color.toString),
       diceRoll = this.diceRoll,
       rollAttempt = this.rollAttempt,
       phase = this.phase.name

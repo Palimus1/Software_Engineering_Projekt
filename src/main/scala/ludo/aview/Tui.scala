@@ -5,7 +5,7 @@ import ludo.controller.ControllerInterface
 import ludo.util.Observer
 
 import scala.io.AnsiColor
-import scala.util.{Success, Failure} // Neuer Import
+import scala.util.{Success, Failure}
 
 case class Tui()(using controller: ControllerInterface) extends Observer:
 
@@ -94,7 +94,7 @@ case class Tui()(using controller: ControllerInterface) extends Observer:
       case Failure(_: BaseClearException) => s"${AnsiColor.RED}You must clear the start field!${AnsiColor.RESET}"
       case Failure(_: BaseLeaveException) => s"${AnsiColor.RED}You must move a piece out of the base!${AnsiColor.RESET}"
       case Failure(e: Throwable) => s"${AnsiColor.RED}An error occurred: ${e.getMessage}${AnsiColor.RESET}"
-      case Success(_) => "" // Der leere Success-Fall
+      case Success(_) => ""
     }
   }
 

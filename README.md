@@ -8,19 +8,28 @@ Ein Scala 3 Projekt.
 ## Direkte Ausführung
 
 compile:
-sbt compile
+
+    sbt compile
 
 run:
-sbt run
 
+    sbt run
+
+tests:
+
+    sbt clean coverage test coverageReport
+  
+dann:
+
+    /target/scala-3.8.2/scoverage-report/ludo/index.html öffnen
+
+
+-------
     WARNUNG: Unsupported JavaFX configuration: classes were loaded from 'unnamed module @49993335'
 sbt lädt JavaFX-Bibliotheken über klassischen Classpath statt über neueres Java-Modulsystem
 -> Meldung ist fest in JavaFX, kann in Terminal nicht unterdrück werden
 -> absolut keine negative Auswirkungen auf die Ausführung oder Funktionalität des Spiels
 
-tests:
-sbt clean coverage test coverageReport
-dann: /target/scala-3.8.2/scoverage-report/ludo/index.html öffnen
 
 
 
