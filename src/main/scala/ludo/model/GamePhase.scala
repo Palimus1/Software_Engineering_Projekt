@@ -1,6 +1,5 @@
 package ludo.model
 
-import scala.io.AnsiColor
 import scala.util.{Try, Success, Failure}
 
 trait GamePhase {

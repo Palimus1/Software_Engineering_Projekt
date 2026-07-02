@@ -8,7 +8,8 @@ import ludo.model.GameState
 import ludo.fileio.impl.XmlFileIO
 
 class LudoModule(initialState: GameState) {
-  given FileIOInterface = new JsonFileIO
+  given  FileIOInterface = new XmlFileIO
+  //given FileIOInterface = new JsonFileIO
   given ControllerInterface = new Controller(initialState)
   
 }

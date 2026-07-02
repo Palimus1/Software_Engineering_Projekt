@@ -94,7 +94,11 @@ Das Image heißt danach lokal `ludo:v1`.
 Nur TUI starten (Standart)
 
 ```bash
+
+
 docker run --rm -it ludo:v1
+
+
 ```
 
 ---
