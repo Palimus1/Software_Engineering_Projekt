@@ -1,7 +1,3 @@
-/*
-  Authors: Stella Keller, Paul Boos
-*/
-
 import ludo._
 
 val playerNames = List("Stella", "Ttella", "Utella", "Vtella")
@@ -12,4 +8,3 @@ val rules = GameLogic(config)
 val newState = rules.movePiece(state, "Stella", 1, 6)
 val newNewState = rules.movePiece(newState, "Utella", 2, 6)
 println(renderer.renderAll(newNewState, rules))
-

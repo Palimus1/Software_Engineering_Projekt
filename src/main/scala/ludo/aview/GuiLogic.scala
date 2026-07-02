@@ -67,7 +67,7 @@ object GuiLogic {
       padding = Insets(10)
       left = bannerBox
       right = btnBox
-      style = "-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-width: 0 0 1 0;"
+      style = "-fx-background-color: #ffffffff; -fx-border-color: #bdc3c7; -fx-border-width: 0 0 1 0;"
     }
 
     val contentGroup = new Group(contentPane)
@@ -98,6 +98,7 @@ object GuiLogic {
     contentGroup.boundsInLocal.onChange { (_, _, _) => updateScale() }
 
     new BorderPane {
+      style = "-fx-background-color: white;"
       top = toolbar
       center = contentContainer
     }
@@ -106,7 +107,7 @@ object GuiLogic {
   private def createBanners(state: GameState): Seq[StackPane] = {
     val errorBanner = new StackPane {
       padding = Insets(5, 15, 5, 15)
-      style = "-fx-background-color: #ffebee; -fx-background-radius: 4; -fx-border-radius: 4; -fx-border-color: #ffcdd2; -fx-border-width: 1;"
+      style = "-fx-background-color: #ffffffff; -fx-background-radius: 4; -fx-border-radius: 4; -fx-border-color: #ffcdd2; -fx-border-width: 1;"
       
       val errorMsg = state.lastError match {
         case Failure(_: NeedSixException) => "You need a 6 to leave the base!"
@@ -188,7 +189,6 @@ object GuiLogic {
       spacing = 30
       alignment = Pos.Center
       padding = Insets(50)
-      style = "-fx-background-color: white; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 20, 0, 0, 10);"
       maxWidth = 600
     }
 
@@ -279,7 +279,6 @@ object GuiLogic {
     }
 
     new StackPane {
-      style = "-fx-background-color: #ecf0f1;"
       children = mainContainer
     }
   }
