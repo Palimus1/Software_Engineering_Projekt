@@ -3,6 +3,9 @@
 [![Scala CI](https://github.com/Palimus1/Software_Engineering_Projekt/actions/workflows/ci.yml/badge.svg?v=1)](https://github.com/Palimus1/Software_Engineering_Projekt/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/Palimus1/Software_Engineering_Projekt/badge.svg?branch=master)](https://coveralls.io/github/Palimus1/Software_Engineering_Projekt?branch=master)
 
+
+[Präsentationslink (hier klicken)](https://1drv.ms/p/c/061b6bc1767993c1/IQCNyqQxJbpcQZqhbqCkthOIAWQdySRy-KAKBn9j_VnEe1c?e=a9vki5)
+
 Ein Scala 3 Projekt.
 
 ## Direkte Ausführung
@@ -29,9 +32,6 @@ dann:
 sbt lädt JavaFX-Bibliotheken über klassischen Classpath statt über neueres Java-Modulsystem
 -> Meldung ist fest in JavaFX, kann in Terminal nicht unterdrück werden
 -> absolut keine negative Auswirkungen auf die Ausführung oder Funktionalität des Spiels
-
-
-
 
 
 ## Ausführen mit Docker
@@ -94,11 +94,7 @@ Das Image heißt danach lokal `ludo:v1`.
 Nur TUI starten (Standart)
 
 ```bash
-
-
 docker run --rm -it ludo:v1
-
-
 ```
 
 ---
